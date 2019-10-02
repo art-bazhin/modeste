@@ -1,0 +1,27 @@
+{
+  "name": "modeste",
+  "version": "0.1.0",
+  "main": "dist/modeste.js",
+  "browser": "dist/modeste.browser.js",
+  "types": "dist/modeste.d.ts",
+  "devDependencies": {
+    "prettier": "^1.16.4",
+    "rollup": "^1.21.4",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-dts": "^0.13.0",
+    "rollup-plugin-typescript2": "^0.24.3",
+    "rollup-plugin-uglify": "^6.0.3",
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "ts-node test/test.ts",
+    "pretest": "npm run build"
+  },
+  "files": [
+    "dist"
+  ]
+}
