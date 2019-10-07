@@ -6,7 +6,7 @@
   "types": "dist/modeste.d.ts",
   "devDependencies": {
     "prettier": "^1.16.4",
-    "rollup": "^1.21.4",
+    "rollup": "^1.23.1",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-dts": "^0.13.0",
