@@ -1,7 +1,7 @@
 import { TEMPLATE_INSTANCE_KEY } from './constants';
-import { ITemplateResult, isTemplateResult } from './ITemplateResult';
-import { ITemplatePart } from './ITemplatePart';
-import { getTemplate } from './ITemplate';
+import { ITemplateResult, isTemplateResult } from './template-result';
+import { ITemplatePart } from './template-part';
+import { getTemplate } from './template';
 
 export interface ITemplateInstance {
   fragment: DocumentFragment;

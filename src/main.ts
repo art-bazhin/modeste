@@ -1,5 +1,5 @@
-import { html } from './ITemplateResult';
-import { getTemplateInstance } from './ITemplateInstance';
+import { html } from './template-result';
+import { getTemplateInstance } from './template-instance';
 
 interface IUser {
   name: string;

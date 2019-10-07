@@ -1,6 +1,6 @@
 import { OPEN_MARK, CLOSE_MARK, ATTR_MARK, ELEM_MARK } from './constants';
-import { ITemplateResult, getTemplateResultHTML } from './ITemplateResult';
-import { ITemplatePart, getTemplatePartsFromComment } from './ITemplatePart';
+import { ITemplateResult, getTemplateResultHTML } from './template-result';
+import { ITemplatePart, getTemplatePartsFromComment } from './template-part';
 
 const templatesMap = new Map<TemplateStringsArray, ITemplate>();
 
