@@ -19,18 +19,9 @@ export function getTemplateInstance(res: ITemplateResult): ITemplateInstance {
 
   parts.forEach((part, i) => {
     if (part.attr) {
-      let target = nodes[i].nextSibling as HTMLElement;
-      if (values[i] === true) {
-        target.setAttribute(part.attr, '');
-      } else if (values[i] === false) {
-        target.removeAttribute(part.attr);
-      } else {
-        target.setAttribute(part.attr, '' + values[i]);
-      }
+      processAttr(part, values[i], nodes[i]);
     } else if (part.event) {
-      let target = nodes[i].nextSibling as any;
-      target.removeAttribute(part.event);
-      target[part.event] = values[i];
+      processEvent(part, values[i], nodes[i]);
     } else {
       let parent = nodes[i].parentElement as Node;
       let value = values[i];
@@ -59,7 +50,55 @@ export function getTemplateInstance(res: ITemplateResult): ITemplateInstance {
   return instance;
 }
 
-export function updateTemplateInstance(instance: ITemplateInstance) {}
+export function updateTemplateInstance(
+  instance: ITemplateInstance,
+  values: unknown[]
+) {
+  const parts = instance.parts;
+  const nodes = instance.nodes;
+  const oldValues = instance.values;
+
+  values.forEach((value, i) => {
+    if (value === oldValues[i]) return;
+    let part = parts[i];
+
+    if (part.attr) {
+      processAttr(part, values[i], nodes[i]);
+    } else if (part.event) {
+      processEvent(part, values[i], nodes[i]);
+    } else {
+      let parent = nodes[i].parentElement as Node;
+      let value = values[i];
+
+      if (value instanceof Array) {
+        value.forEach(el => {
+          let node = createNode(el);
+          node && parent.insertBefore(node, nodes[i]);
+        });
+      } else {
+        let node = createNode(value);
+        node && parent.insertBefore(node, nodes[i]);
+      }
+    }
+  });
+}
+
+function processAttr(part: ITemplatePart, value: unknown, node: Node) {
+  const target = node.nextSibling as HTMLElement;
+  if (value === true) {
+    target.setAttribute(part.attr!, '');
+  } else if (value === false) {
+    target.removeAttribute(part.attr!);
+  } else {
+    target.setAttribute(part.attr!, '' + value);
+  }
+}
+
+function processEvent(part: ITemplatePart, value: unknown, node: Node) {
+  const target = node.nextSibling as any;
+  target.removeAttribute(part.event);
+  target[part.event!] = value;
+}
 
 function getNodeFromPosition(
   position: number[],
