@@ -1,7 +1,11 @@
-import { TEMPLATE_INSTANCE_KEY } from './constants';
+import {
+  TEMPLATE_INSTANCE_KEY,
+  TEMPLATE_INSTANCE_START_VALUE
+} from './constants';
 import { ITemplateResult, isTemplateResult } from './template-result';
 import { ITemplatePart } from './template-part';
 import { getTemplate } from './template';
+import { createMark } from './dom';
 
 export interface ITemplateInstance {
   fragment: DocumentFragment;
@@ -18,22 +22,20 @@ export function getTemplateInstance(res: ITemplateResult): ITemplateInstance {
   const nodes = parts.map(part => getNodeFromPosition(part.position, fragment));
 
   parts.forEach((part, i) => {
-    if (part.attr) {
-      processAttr(part, values[i], nodes[i]);
-    } else if (part.event) {
-      processEvent(part, values[i], nodes[i]);
-    } else {
-      let parent = nodes[i].parentElement as Node;
-      let value = values[i];
+    const value = values[i];
+    const node = nodes[i];
 
+    if (part.attr) {
+      processAttr(part.attr, value, node);
+    } else if (part.event) {
+      processEvent(part.event, value, node);
+    } else {
       if (value instanceof Array) {
         value.forEach(el => {
-          let node = createNode(el);
-          node && parent.insertBefore(node, nodes[i]);
+          insertBefore(el, nodes[i]);
         });
       } else {
-        let node = createNode(value);
-        node && parent.insertBefore(node, nodes[i]);
+        insertBefore(value, nodes[i]);
       }
     }
   });
@@ -54,50 +56,47 @@ export function updateTemplateInstance(
   instance: ITemplateInstance,
   values: unknown[]
 ) {
-  const parts = instance.parts;
-  const nodes = instance.nodes;
-  const oldValues = instance.values;
-
-  values.forEach((value, i) => {
-    if (value === oldValues[i]) return;
-    let part = parts[i];
-
-    if (part.attr) {
-      processAttr(part, values[i], nodes[i]);
-    } else if (part.event) {
-      processEvent(part, values[i], nodes[i]);
-    } else {
-      let parent = nodes[i].parentElement as Node;
-      let value = values[i];
-
-      if (value instanceof Array) {
-        value.forEach(el => {
-          let node = createNode(el);
-          node && parent.insertBefore(node, nodes[i]);
-        });
-      } else {
-        let node = createNode(value);
-        node && parent.insertBefore(node, nodes[i]);
-      }
-    }
-  });
+  // const parts = instance.parts;
+  // const nodes = instance.nodes;
+  // const oldValues = instance.values;
+  // values.forEach((value, i) => {
+  //   if (value === oldValues[i]) return;
+  //   let part = parts[i];
+  //   if (part.attr) {
+  //     processAttr(part, values[i], nodes[i]);
+  //   } else if (part.event) {
+  //     processEvent(part, values[i], nodes[i]);
+  //   } else {
+  //     let parent = nodes[i].parentElement as Node;
+  //     let value = values[i];
+  //     if (value instanceof Array) {
+  //       value.forEach(el => {
+  //         let node = createNode(el);
+  //         node && parent.insertBefore(node, nodes[i]);
+  //       });
+  //     } else {
+  //       let node = createNode(value);
+  //       node && parent.insertBefore(node, nodes[i]);
+  //     }
+  //   }
+  // });
 }
 
-function processAttr(part: ITemplatePart, value: unknown, node: Node) {
+function processAttr(attr: string, value: unknown, node: Node) {
   const target = node as HTMLElement;
   if (value === true) {
-    target.setAttribute(part.attr!, '');
+    target.setAttribute(attr, '');
   } else if (value === false) {
-    target.removeAttribute(part.attr!);
+    target.removeAttribute(attr);
   } else {
-    target.setAttribute(part.attr!, '' + value);
+    target.setAttribute(attr, '' + value);
   }
 }
 
-function processEvent(part: ITemplatePart, value: unknown, node: Node) {
+function processEvent(event: string, value: unknown, node: Node) {
   const target = node as any;
-  target.removeAttribute(part.event);
-  target[part.event!] = value;
+  target.removeAttribute(event);
+  target[event] = value;
 }
 
 function getNodeFromPosition(
@@ -111,8 +110,21 @@ function getNodeFromPosition(
   return getNodeFromPosition(position, child, level + 1);
 }
 
-function createNode(value: any) {
-  return isTemplateResult(value)
-    ? getTemplateInstance(value).fragment
-    : document.createTextNode('' + value);
+function insertBefore(value: any, refChild: Node) {
+  const parent = refChild.parentElement!;
+
+  if (isTemplateResult(value)) {
+    const instance = getTemplateInstance(value);
+    const openMark = createMark(
+      TEMPLATE_INSTANCE_KEY,
+      TEMPLATE_INSTANCE_START_VALUE
+    );
+    const closeMark = createMark(TEMPLATE_INSTANCE_KEY, instance);
+
+    parent.insertBefore(openMark, refChild);
+    parent.insertBefore(instance.fragment, refChild);
+    parent.insertBefore(closeMark, refChild);
+  } else {
+    parent.insertBefore(document.createTextNode('' + value), refChild);
+  }
 }
