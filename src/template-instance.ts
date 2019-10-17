@@ -84,7 +84,7 @@ export function updateTemplateInstance(
 }
 
 function processAttr(part: ITemplatePart, value: unknown, node: Node) {
-  const target = node.nextSibling as HTMLElement;
+  const target = node as HTMLElement;
   if (value === true) {
     target.setAttribute(part.attr!, '');
   } else if (value === false) {
@@ -95,7 +95,7 @@ function processAttr(part: ITemplatePart, value: unknown, node: Node) {
 }
 
 function processEvent(part: ITemplatePart, value: unknown, node: Node) {
-  const target = node.nextSibling as any;
+  const target = node as any;
   target.removeAttribute(part.event);
   target[part.event!] = value;
 }

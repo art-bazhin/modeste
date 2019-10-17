@@ -1,4 +1,4 @@
-import { ATTR_MARK, ELEM_MARK } from './constants';
+import { ATTR_MARK, MARK } from './constants';
 
 export interface ITemplatePart {
   attr?: string;
@@ -6,40 +6,30 @@ export interface ITemplatePart {
   position: number[];
 }
 
-export function getTemplatePartsFromComment(
-  comment: Comment,
+export function getTemplatePartsFromElement(
+  node: HTMLElement,
   position: number[]
 ): ITemplatePart[] {
   const parts: ITemplatePart[] = [];
+  const attrs = node.attributes;
 
-  switch (comment.textContent) {
-    case ATTR_MARK:
-      const node = comment.nextSibling as HTMLElement;
-      const attrs = node.attributes;
+  for (let i = 0; i < attrs.length; i++) {
+    let part: ITemplatePart = { position: position.slice() };
 
-      for (let i = 0; i < attrs.length; i++) {
-        let part: ITemplatePart = { position: position.slice() };
+    if (attrs[i].textContent === ATTR_MARK) {
+      const attrName = attrs[i].name;
 
-        if (attrs[i].textContent === ATTR_MARK) {
-          const attrName = attrs[i].name;
-
-          if (attrName.substr(0, 2) === 'on') {
-            part.event = attrName;
-          } else {
-            part.attr = attrName;
-          }
-
-          parts.push(part);
-        }
+      if (attrName.substr(0, 2) === 'on') {
+        part.event = attrName;
+      } else {
+        part.attr = attrName;
       }
 
-      break;
-
-    case ELEM_MARK:
-      parts.push({ position: position.slice() });
-
-      break;
+      parts.push(part);
+    }
   }
+
+  node.removeAttribute(ATTR_MARK);
 
   return parts;
 }

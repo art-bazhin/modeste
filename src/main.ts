@@ -69,6 +69,8 @@ let ts = performance.now();
 
 document.body.appendChild(getTemplateInstance(app()).fragment as Node);
 
-console.log(performance.now() - ts);
+let dif = performance.now() - ts;
+
+console.log(dif);
 
 // if (fragment) document.body.appendChild(fragment);

@@ -1,6 +1,7 @@
-import { OPEN_MARK, CLOSE_MARK, ATTR_MARK, ELEM_MARK } from './constants';
+import { OPEN_MARK, CLOSE_MARK, MARK, ATTR_MARK } from './constants';
 import { ITemplateResult, getTemplateResultHTML } from './template-result';
-import { ITemplatePart, getTemplatePartsFromComment } from './template-part';
+import { ITemplatePart, getTemplatePartsFromElement } from './template-part';
+import { isCommentNode, isElementNode } from './dom';
 
 const templatesMap = new Map<TemplateStringsArray, ITemplate>();
 
@@ -29,30 +30,22 @@ export function getTemplate(res: ITemplateResult): ITemplate {
   while (node) {
     let parent = node.parentNode;
 
-    switch (node.nodeType) {
-      case Node.COMMENT_NODE:
-        parts = parts.concat(
-          getTemplatePartsFromComment(node as Comment, position)
-        );
+    if (isCommentNode(node) && node.textContent === MARK) {
+      parts.push({ position: position.slice() });
+      node = node.nextSibling;
+    } else if (isElementNode(node)) {
+      if (node.hasAttribute(ATTR_MARK)) {
+        parts = parts.concat(getTemplatePartsFromElement(node, position));
+      }
 
-        if (node.textContent === ELEM_MARK || node.textContent === ATTR_MARK) {
-          let placeholder = document.createTextNode('');
-          (node.parentNode as Node).replaceChild(placeholder, node);
-          node = placeholder;
-        }
-
+      if (node.childNodes.length) {
+        node = node.childNodes[0];
+        position.push(-1);
+      } else {
         node = node.nextSibling;
-        break;
-      case Node.ELEMENT_NODE:
-        if (node.childNodes.length) {
-          node = node.childNodes[0];
-          position.push(-1);
-        } else {
-          node = node.nextSibling;
-        }
-        break;
-      default:
-        node = node.nextSibling;
+      }
+    } else {
+      node = node.nextSibling;
     }
 
     if (!node && parent && parent.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {

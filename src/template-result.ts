@@ -1,4 +1,4 @@
-import { MARK, ATTR_COMMENT, ATTR_MARK, ELEM_COMMENT } from './constants';
+import { MARK, ATTR_MARK, MARK_COMMENT } from './constants';
 
 const markRegEx = new RegExp(MARK, 'gm');
 const tagRegEx = /<[a-z][a-z\d-]*([^<>]|("[^"]*")|('[^']*'))*>/gm;
@@ -17,12 +17,18 @@ export function getTemplateResultHTML(res: ITemplateResult) {
 
   html = html.replace(tagRegEx, function(tag) {
     let tagProcessed = tag.replace(attrRegEx, '$1=' + ATTR_MARK);
-    if (tagProcessed !== tag) tagProcessed = ATTR_COMMENT + tagProcessed;
+
+    if (tagProcessed !== tag) {
+      tagProcessed = tagProcessed.replace(
+        ATTR_MARK,
+        ATTR_MARK + ' ' + ATTR_MARK
+      );
+    }
 
     return tagProcessed;
   });
 
-  return html.replace(markRegEx, ELEM_COMMENT);
+  return html.replace(markRegEx, MARK_COMMENT);
 }
 
 export function isTemplateResult(res: any): res is ITemplateResult {
