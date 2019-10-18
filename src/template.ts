@@ -1,7 +1,7 @@
-import { MARK, ATTR_MARK } from './constants';
+import { MARK, ATTR_MARK, CLOSE_MARK, OPEN_MARK } from './constants';
 import { ITemplateResult, getTemplateResultHTML } from './template-result';
 import { ITemplatePart, getTemplatePartsFromElement } from './template-part';
-import { isCommentNode, isElementNode, createMark } from './dom';
+import { isCommentNode, isElementNode } from './dom';
 
 const templatesMap = new Map<TemplateStringsArray, ITemplate>();
 
@@ -20,8 +20,8 @@ export function getTemplate(res: ITemplateResult): ITemplate {
 
   const fragment = templateElement.content;
 
-  // fragment.appendChild(document.createComment(CLOSE_MARK));
-  // fragment.insertBefore(document.createComment(OPEN_MARK), fragment.firstChild);
+  fragment.appendChild(document.createComment(CLOSE_MARK));
+  fragment.insertBefore(document.createComment(OPEN_MARK), fragment.firstChild);
 
   let node = fragment.firstChild as Node | null;
   let position = [0];
@@ -31,12 +31,13 @@ export function getTemplate(res: ITemplateResult): ITemplate {
     let parent = node.parentNode;
 
     if (isCommentNode(node) && node.textContent === MARK) {
-      const placeholder = createMark();
+      // const placeholder = document.createTextNode('');
 
-      node.parentNode!.replaceChild(placeholder, node);
-      node = placeholder.nextSibling;
+      // node.parentNode!.replaceChild(placeholder, node);
+      // node = placeholder.nextSibling;
 
       parts.push({ position: position.slice() });
+      node = node.nextSibling;
     } else if (isElementNode(node)) {
       if (node.hasAttribute(ATTR_MARK)) {
         parts = parts.concat(getTemplatePartsFromElement(node, position));

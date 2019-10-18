@@ -1,11 +1,7 @@
-import {
-  TEMPLATE_INSTANCE_KEY,
-  TEMPLATE_INSTANCE_START_VALUE
-} from './constants';
+import { TEMPLATE_INSTANCE_KEY } from './constants';
 import { ITemplateResult, isTemplateResult } from './template-result';
 import { ITemplatePart } from './template-part';
 import { getTemplate } from './template';
-import { createMark } from './dom';
 
 export interface ITemplateInstance {
   fragment: DocumentFragment;
@@ -115,15 +111,8 @@ function insertBefore(value: any, refChild: Node) {
 
   if (isTemplateResult(value)) {
     const instance = getTemplateInstance(value);
-    const openMark = createMark(
-      TEMPLATE_INSTANCE_KEY,
-      TEMPLATE_INSTANCE_START_VALUE
-    );
-    const closeMark = createMark(TEMPLATE_INSTANCE_KEY, instance);
-
-    parent.insertBefore(openMark, refChild);
     parent.insertBefore(instance.fragment, refChild);
-    parent.insertBefore(closeMark, refChild);
+    (parent.previousSibling as any)[TEMPLATE_INSTANCE_KEY] = instance;
   } else {
     parent.insertBefore(document.createTextNode('' + value), refChild);
   }
