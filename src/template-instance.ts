@@ -1,21 +1,33 @@
-import { TEMPLATE_INSTANCE_KEY } from './constants';
+import {
+  TEMPLATE_INSTANCE_KEY,
+  MARK_TYPE_KEY,
+  MarkTypes,
+  EVENTS_KEY
+} from './constants';
 import { ITemplateResult, isTemplateResult } from './template-result';
 import { ITemplatePart } from './template-part';
-import { getTemplate } from './template';
+import { getTemplate, ITemplate } from './template';
 
 export interface ITemplateInstance {
+  template: ITemplate;
   fragment: DocumentFragment;
   parts: ITemplatePart[];
-  values: unknown[];
+  values: any[];
   nodes: Node[];
+  openMark: any;
+  closeMark: any;
 }
 
-export function getTemplateInstance(res: ITemplateResult): ITemplateInstance {
+export function createTemplateInstance(
+  res: ITemplateResult
+): ITemplateInstance {
   const template = getTemplate(res);
   const parts = template.parts;
   const values = res.values;
   const fragment = template.fragment.cloneNode(true) as DocumentFragment;
   const nodes = parts.map(part => getNodeFromPosition(part.position, fragment));
+  const openMark = fragment.firstChild as any;
+  const closeMark = fragment.lastChild as any;
 
   parts.forEach((part, i) => {
     const value = values[i];
@@ -25,74 +37,166 @@ export function getTemplateInstance(res: ITemplateResult): ITemplateInstance {
       processAttr(part.attr, value, node);
     } else if (part.event) {
       processEvent(part.event, value, node);
+    } else if (value instanceof Array) {
+      value.forEach(el => {
+        insertBefore(el, node);
+      });
     } else {
-      if (value instanceof Array) {
-        value.forEach(el => {
-          insertBefore(el, nodes[i]);
-        });
-      } else {
-        insertBefore(value, nodes[i]);
-      }
+      insertBefore(value, node);
     }
   });
 
   const instance = {
+    template,
     fragment,
     nodes,
     values,
-    parts
+    parts,
+    openMark,
+    closeMark
   };
 
-  (fragment.lastChild as any)[TEMPLATE_INSTANCE_KEY] = instance;
+  openMark[TEMPLATE_INSTANCE_KEY] = instance;
+  closeMark[TEMPLATE_INSTANCE_KEY] = instance;
+
+  openMark[MARK_TYPE_KEY] = MarkTypes.Open;
+  closeMark[MARK_TYPE_KEY] = MarkTypes.Close;
 
   return instance;
 }
 
 export function updateTemplateInstance(
   instance: ITemplateInstance,
-  values: unknown[]
-) {
-  // const parts = instance.parts;
-  // const nodes = instance.nodes;
-  // const oldValues = instance.values;
-  // values.forEach((value, i) => {
-  //   if (value === oldValues[i]) return;
-  //   let part = parts[i];
-  //   if (part.attr) {
-  //     processAttr(part, values[i], nodes[i]);
-  //   } else if (part.event) {
-  //     processEvent(part, values[i], nodes[i]);
-  //   } else {
-  //     let parent = nodes[i].parentElement as Node;
-  //     let value = values[i];
-  //     if (value instanceof Array) {
-  //       value.forEach(el => {
-  //         let node = createNode(el);
-  //         node && parent.insertBefore(node, nodes[i]);
-  //       });
-  //     } else {
-  //       let node = createNode(value);
-  //       node && parent.insertBefore(node, nodes[i]);
-  //     }
-  //   }
-  // });
+  values: any[]
+): ITemplateInstance {
+  const parts = instance.template.parts;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    const value = values[i];
+    const oldValue = instance.values[i];
+    const node = instance.nodes[i];
+
+    if (value === oldValue) continue;
+
+    if (part.attr) {
+      processAttr(part.attr, value, node);
+    } else if (part.event) {
+      processEvent(part.event, value, node);
+    } else if (value instanceof Array || oldValue instanceof Array) {
+      const valueArray = valueToArray(value);
+      const oldValueArray = valueToArray(oldValue);
+
+      const min = Math.min(valueArray.length, oldValueArray.length);
+      const dif = Math.abs(valueArray.length - oldValueArray.length);
+
+      let current = node;
+
+      for (let i = min - 1; i >= 0; i--) {
+        current = getPreviousSibling(current)!;
+        current = updateNode(value[i], current);
+      }
+
+      if (valueArray.length > oldValueArray.length) {
+        for (let i = 0; i < dif; i++) {
+          insertBefore(valueArray[i], current);
+        }
+      } else {
+        for (let i = 0; i < dif; i++) {
+          removeNode(getPreviousSibling(current)!);
+        }
+      }
+    } else if (isOpenMark(node.previousSibling!)) {
+      insertBefore(value, node);
+    } else {
+      updateNode(value, node.previousSibling!);
+    }
+  }
+
+  instance.values = values;
+
+  return instance.closeMark;
 }
 
-function processAttr(attr: string, value: unknown, node: Node) {
+function getPreviousSibling(node: Node) {
+  if (isCloseMark(node))
+    return (node as any)[TEMPLATE_INSTANCE_KEY].openMark
+      .previousSibling as Node;
+  return node.previousSibling;
+}
+
+function valueToArray(value: any) {
+  if (value.length === 0) return [];
+  if (!value.length) return [value];
+  return value as Array<any>;
+}
+
+function isNotNullOrUndefined(val: any) {
+  return val !== null && val !== undefined;
+}
+
+function updateNode(value: any, node: Node) {
+  const type = hasSameType(value, node);
+
+  if (!type) {
+    const newNode = insertBefore(value, node.nextSibling!);
+    removeNode(node);
+    return newNode;
+  } else if (type === 'text') {
+    (node as Text).textContent = value;
+    return node;
+  } else {
+    return updateTemplateInstance(
+      (node as any)[TEMPLATE_INSTANCE_KEY] as ITemplateInstance,
+      value.values
+    );
+  }
+}
+
+function removeNode(node: Node) {
+  const parent = node.parentNode!;
+
+  if (isCloseMark(node)) {
+    let instance = getTemplateInstanceFromNode(node);
+
+    while (
+      !isOpenMark(node) ||
+      instance !== getTemplateInstanceFromNode(node)
+    ) {
+      let next = node.previousSibling!;
+      parent.removeChild(node);
+      node = next;
+    }
+  }
+
+  parent.removeChild(node);
+}
+
+function getTemplateInstanceFromNode(node: Node) {
+  return (node as any)[TEMPLATE_INSTANCE_KEY];
+}
+
+function processAttr(attr: string, value: any, node: Node) {
   const target = node as HTMLElement;
   if (value === true) {
     target.setAttribute(attr, '');
   } else if (value === false) {
     target.removeAttribute(attr);
   } else {
-    target.setAttribute(attr, '' + value);
+    target.setAttribute(attr, value as string);
   }
 }
 
-function processEvent(event: string, value: unknown, node: Node) {
+function processEvent(event: string, value: any, node: Node) {
   const target = node as any;
+  const str = value.toString();
+
+  if (!target[EVENTS_KEY]) target[EVENTS_KEY] = {};
+  if (target[EVENTS_KEY][event] === str) return;
+
   target.removeAttribute(event);
   target[event] = value;
+  target[EVENTS_KEY][event] = str;
 }
 
 function getNodeFromPosition(
@@ -109,11 +213,36 @@ function getNodeFromPosition(
 function insertBefore(value: any, refChild: Node) {
   const parent = refChild.parentElement!;
 
+  if (isCloseMark(refChild))
+    refChild = (refChild as any)[TEMPLATE_INSTANCE_KEY].openMark as Node;
+
   if (isTemplateResult(value)) {
-    const instance = getTemplateInstance(value);
+    const instance = createTemplateInstance(value);
     parent.insertBefore(instance.fragment, refChild);
-    (parent.previousSibling as any)[TEMPLATE_INSTANCE_KEY] = instance;
-  } else {
-    parent.insertBefore(document.createTextNode('' + value), refChild);
+    return instance.closeMark;
+  } else if (isNotNullOrUndefined(value)) {
+    return parent.insertBefore(document.createTextNode('' + value), refChild);
   }
+}
+
+function hasSameType(value: any, node: Node) {
+  if (node.nodeType === Node.TEXT_NODE && typeof value === 'string')
+    return 'text';
+  else if (
+    isTemplateResult(value) &&
+    isCloseMark(node) &&
+    (node as any)[TEMPLATE_INSTANCE_KEY] &&
+    (node as any)[TEMPLATE_INSTANCE_KEY].template === getTemplate(value)
+  )
+    return 'html';
+
+  return false;
+}
+
+function isOpenMark(node: Node) {
+  return (node as any)[MARK_TYPE_KEY] === MarkTypes.Open;
+}
+
+function isCloseMark(node: Node) {
+  return (node as any)[MARK_TYPE_KEY] === MarkTypes.Close;
 }

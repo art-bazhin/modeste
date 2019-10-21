@@ -1,4 +1,4 @@
-import { MARK, ATTR_MARK, CLOSE_MARK, OPEN_MARK } from './constants';
+import { PLACEHOLDER_MARK, ATTR_MARK, MARK } from './constants';
 import { ITemplateResult, getTemplateResultHTML } from './template-result';
 import { ITemplatePart, getTemplatePartsFromElement } from './template-part';
 import { isCommentNode, isElementNode } from './dom';
@@ -20,8 +20,8 @@ export function getTemplate(res: ITemplateResult): ITemplate {
 
   const fragment = templateElement.content;
 
-  fragment.appendChild(document.createComment(CLOSE_MARK));
-  fragment.insertBefore(document.createComment(OPEN_MARK), fragment.firstChild);
+  fragment.appendChild(document.createComment(MARK));
+  fragment.insertBefore(document.createComment(MARK), fragment.firstChild);
 
   let node = fragment.firstChild as Node | null;
   let position = [0];
@@ -30,7 +30,7 @@ export function getTemplate(res: ITemplateResult): ITemplate {
   while (node) {
     let parent = node.parentNode;
 
-    if (isCommentNode(node) && node.textContent === MARK) {
+    if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
       // const placeholder = document.createTextNode('');
 
       // node.parentNode!.replaceChild(placeholder, node);

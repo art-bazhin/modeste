@@ -2,12 +2,16 @@ const RANDOM = Math.random()
   .toString(36)
   .substr(2, 4);
 
-const PREFIX = 'mdst-';
+export const MARK = 'mdst-' + RANDOM;
+export const PLACEHOLDER_MARK = MARK + '-ph';
+export const ATTR_MARK = MARK + '-attr';
+export const PLACEHOLDER_COMMENT = '<!--' + PLACEHOLDER_MARK + '-->';
 
-export const MARK = PREFIX + 'm-' + RANDOM;
-export const ATTR_MARK = PREFIX + 'a-' + RANDOM;
-export const OPEN_MARK = PREFIX + 'o-' + RANDOM;
-export const CLOSE_MARK = PREFIX + 'c-' + RANDOM;
-export const MARK_COMMENT = '<!--' + MARK + '-->';
+export const TEMPLATE_INSTANCE_KEY = '__mdstTemplateInstance';
+export const EVENTS_KEY = '__mdstEvents';
+export const MARK_TYPE_KEY = '__mdstMarkType';
 
-export const TEMPLATE_INSTANCE_KEY = '__mdst_' + RANDOM;
+export enum MarkTypes {
+  Open = 1,
+  Close = 2
+}

@@ -1,9 +1,15 @@
-import { MARK, ATTR_MARK, MARK_COMMENT } from './constants';
+import { PLACEHOLDER_MARK, ATTR_MARK, PLACEHOLDER_COMMENT } from './constants';
 
-const markRegEx = new RegExp(MARK, 'gm');
+const markRegEx = new RegExp(PLACEHOLDER_MARK, 'gm');
 const tagRegEx = /<[a-z][a-z\d-]*([^<>]|("[^"]*")|('[^']*'))*>/gm;
 const attrRegEx = new RegExp(
-  '([a-z][a-z\\d-]*)=((' + MARK + ')|("' + MARK + '")|(\'' + MARK + "'))",
+  '([a-z][a-z\\d-]*)=((' +
+    PLACEHOLDER_MARK +
+    ')|("' +
+    PLACEHOLDER_MARK +
+    '")|(\'' +
+    PLACEHOLDER_MARK +
+    "'))",
   'gm'
 );
 
@@ -13,7 +19,7 @@ export interface ITemplateResult {
 }
 
 export function getTemplateResultHTML(res: ITemplateResult) {
-  let html = res.strings.join(MARK);
+  let html = res.strings.join(PLACEHOLDER_MARK);
 
   html = html.replace(tagRegEx, function(tag) {
     let tagProcessed = tag.replace(attrRegEx, '$1=' + ATTR_MARK);
@@ -28,11 +34,11 @@ export function getTemplateResultHTML(res: ITemplateResult) {
     return tagProcessed;
   });
 
-  return html.replace(markRegEx, MARK_COMMENT);
+  return html.replace(markRegEx, PLACEHOLDER_COMMENT);
 }
 
 export function isTemplateResult(res: any): res is ITemplateResult {
-  return !!(res.values && res.strings);
+  return !!(res && res.values && res.strings);
 }
 
 export function html(

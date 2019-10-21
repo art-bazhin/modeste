@@ -1,5 +1,27 @@
 import { html } from './template-result';
-import { getTemplateInstance } from './template-instance';
+import { createTemplateInstance } from './template-instance';
+import { render } from './render';
+
+let measures: {
+  [key: string]: { count: number; total: number; last: number };
+} = {};
+
+function startMeasure(key: string) {
+  if (!measures[key]) measures[key] = { count: 0, total: 0, last: 0 };
+
+  measures[key].last = performance.now();
+}
+
+function endMeasure(key: string) {
+  measures[key].last = performance.now() - measures[key].last;
+  measures[key].total += measures[key].last;
+  measures[key].count++;
+
+  console.log(
+    `---${key} measure---\nLast: ${measures[key].last}\nMean: ${measures[key]
+      .total / measures[key].count}\n`
+  );
+}
 
 interface IUser {
   name: string;
@@ -38,13 +60,30 @@ for (let i = 0; i < 4000; i++) {
   });
 }
 
-let button = () => html`
-  <button onclick=${() => console.log('CLICK!')}>CLICK ME</button>
+function toggleUser(user: IUser) {
+  user.active = !user.active;
+  r('toggle');
+}
+
+function setUserName(user: IUser, name: string) {
+  user.name = name;
+  r();
+}
+
+let button = (props: { onclick: (...args: any[]) => any }) => html`
+  <button onclick=${props.onclick}>Toggle active</button>
 `;
 
 let card = (user: IUser) => html`
-  <div class=${'card'}>
-    <div><input type="text" value=${user.name} /></div>
+  <div class=${'card' + (user.active ? '' : ' inactive')}>
+    <div>
+      <input
+        type="text"
+        value=${user.name}
+        oninput=${(e: InputEvent) =>
+          setUserName(user, (e.target as HTMLInputElement).value)}
+      />
+    </div>
     <p>Name: ${user.name}</p>
     <p>Age: ${user.age}</p>
     <p>Test: ${users[0].name}</p>
@@ -55,22 +94,36 @@ let card = (user: IUser) => html`
       : html`
           <p>Inactive</p>
         `}
-    ${button()}
+    ${button({ onclick: () => toggleUser(user) })}
   </div>
 `;
 
-let app = () => html`
-  <div>
-    ${users.map(user => card(user))}
-  </div>
-`;
+let app = () => {
+  const cards = users.map(user => card(user));
 
-let ts = performance.now();
+  return html`
+    <div>
+      ${cards}
+    </div>
+  `;
+};
 
-document.body.appendChild(getTemplateInstance(app()).fragment as Node);
+let shouldRender = false;
 
-let dif = performance.now() - ts;
+function r(key?: string) {
+  shouldRender = true;
 
-console.log(dif);
+  return requestAnimationFrame(() => {
+    if (!shouldRender) return;
+
+    if (key) startMeasure(key);
+    render(app(), document.body);
+    if (key) endMeasure(key);
+
+    shouldRender = false;
+  });
+}
+
+r();
 
 // if (fragment) document.body.appendChild(fragment);
