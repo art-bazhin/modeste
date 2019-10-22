@@ -65,6 +65,11 @@ function toggleUser(user: IUser) {
   r('toggle');
 }
 
+function reverse() {
+  users.reverse();
+  r('reverse');
+}
+
 function setUserName(user: IUser, name: string) {
   user.name = name;
   r();
@@ -102,6 +107,9 @@ let app = () => {
   const cards = users.map(user => card(user));
 
   return html`
+    <div>
+      <button onclick=${reverse}>Reverse</button>
+    </div>
     <div>
       ${cards}
     </div>

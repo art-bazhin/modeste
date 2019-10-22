@@ -29,7 +29,8 @@ export function createTemplateInstance(
   const openMark = fragment.firstChild as any;
   const closeMark = fragment.lastChild as any;
 
-  parts.forEach((part, i) => {
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
     const value = values[i];
     const node = nodes[i];
 
@@ -37,14 +38,14 @@ export function createTemplateInstance(
       processAttr(part.attr, value, node);
     } else if (part.event) {
       processEvent(part.event, value, node);
-    } else if (value instanceof Array) {
-      value.forEach(el => {
-        insertBefore(el, node);
-      });
+    } else if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        insertBefore(value[i], node);
+      }
     } else {
       insertBefore(value, node);
     }
-  });
+  }
 
   const instance = {
     template,
@@ -72,18 +73,19 @@ export function updateTemplateInstance(
   const parts = instance.template.parts;
 
   for (let i = 0; i < parts.length; i++) {
-    const part = parts[i];
     const value = values[i];
     const oldValue = instance.values[i];
-    const node = instance.nodes[i];
 
     if (value === oldValue) continue;
+
+    const node = instance.nodes[i];
+    const part = parts[i];
 
     if (part.attr) {
       processAttr(part.attr, value, node);
     } else if (part.event) {
       processEvent(part.event, value, node);
-    } else if (value instanceof Array || oldValue instanceof Array) {
+    } else {
       const valueArray = valueToArray(value);
       const oldValueArray = valueToArray(oldValue);
 
@@ -94,7 +96,7 @@ export function updateTemplateInstance(
 
       for (let i = min - 1; i >= 0; i--) {
         current = getPreviousSibling(current)!;
-        current = updateNode(value[i], current);
+        current = updateNode(valueArray[i], current);
       }
 
       if (valueArray.length > oldValueArray.length) {
@@ -106,10 +108,6 @@ export function updateTemplateInstance(
           removeNode(getPreviousSibling(current)!);
         }
       }
-    } else if (isOpenMark(node.previousSibling!)) {
-      insertBefore(value, node);
-    } else {
-      updateNode(value, node.previousSibling!);
     }
   }
 
@@ -126,9 +124,8 @@ function getPreviousSibling(node: Node) {
 }
 
 function valueToArray(value: any) {
-  if (value.length === 0) return [];
-  if (!value.length) return [value];
-  return value as Array<any>;
+  if (Array.isArray(value)) return value as any[];
+  return [value];
 }
 
 function isNotNullOrUndefined(val: any) {
