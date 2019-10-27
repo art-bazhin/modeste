@@ -92,13 +92,7 @@ let card = (user: IUser) => html`
     <p>Name: ${user.name}</p>
     <p>Age: ${user.age}</p>
     <p>Test: ${users[0].name}</p>
-    ${user.active
-      ? html`
-          <p>Active</p>
-        `
-      : html`
-          <p>Inactive</p>
-        `}
+    <p>${user.active ? 'Active' : 'Inactive'}</p>
     ${button({ onclick: () => toggleUser(user) })}
   </div>
 `;

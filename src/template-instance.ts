@@ -223,12 +223,12 @@ function insertBefore(value: any, refChild: Node) {
 }
 
 function hasSameType(value: any, node: Node) {
-  if (node.nodeType === Node.TEXT_NODE && typeof value === 'string')
-    return 'text';
+  const isRes = isTemplateResult(value);
+
+  if (node.nodeType === Node.TEXT_NODE && !isRes) return 'text';
   else if (
-    isTemplateResult(value) &&
+    isRes &&
     isCloseMark(node) &&
-    (node as any)[TEMPLATE_INSTANCE_KEY] &&
     (node as any)[TEMPLATE_INSTANCE_KEY].template === getTemplate(value)
   )
     return 'html';
