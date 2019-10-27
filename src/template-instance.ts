@@ -2,7 +2,8 @@ import {
   TEMPLATE_INSTANCE_KEY,
   MARK_TYPE_KEY,
   MarkTypes,
-  EVENTS_KEY
+  EVENTS_KEY,
+  NodeTypes
 } from './constants';
 import { ITemplateResult, isTemplateResult } from './template-result';
 import { ITemplatePart } from './template-part';
@@ -139,7 +140,7 @@ function updateNode(value: any, node: Node) {
     const newNode = insertBefore(value, node.nextSibling!);
     removeNode(node);
     return newNode;
-  } else if (type === 'text') {
+  } else if (type === NodeTypes.Text) {
     (node as Text).textContent = value;
     return node;
   } else {
@@ -186,12 +187,16 @@ function processAttr(attr: string, value: any, node: Node) {
 
 function processEvent(event: string, value: any, node: Node) {
   const target = node as any;
+
+  if (!target[EVENTS_KEY]) {
+    target[EVENTS_KEY] = {};
+    target.removeAttribute(event);
+  }
+
   const str = value.toString();
 
-  if (!target[EVENTS_KEY]) target[EVENTS_KEY] = {};
   if (target[EVENTS_KEY][event] === str) return;
 
-  target.removeAttribute(event);
   target[event] = value;
   target[EVENTS_KEY][event] = str;
 }
@@ -225,13 +230,13 @@ function insertBefore(value: any, refChild: Node) {
 function hasSameType(value: any, node: Node) {
   const isRes = isTemplateResult(value);
 
-  if (node.nodeType === Node.TEXT_NODE && !isRes) return 'text';
+  if (node.nodeType === Node.TEXT_NODE && !isRes) return NodeTypes.Text;
   else if (
     isRes &&
     isCloseMark(node) &&
     (node as any)[TEMPLATE_INSTANCE_KEY].template === getTemplate(value)
   )
-    return 'html';
+    return NodeTypes.Element;
 
   return false;
 }

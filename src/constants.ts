@@ -15,3 +15,8 @@ export enum MarkTypes {
   Open = 1,
   Close = 2
 }
+
+export enum NodeTypes {
+  Text = 1,
+  Element = 2
+}
