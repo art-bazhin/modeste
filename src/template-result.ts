@@ -15,7 +15,7 @@ const attrRegEx = new RegExp(
 
 export interface ITemplateResult {
   strings: TemplateStringsArray;
-  values: unknown[];
+  values: any[];
 }
 
 export function getTemplateResultHTML(res: ITemplateResult) {
@@ -43,7 +43,7 @@ export function isTemplateResult(res: any): res is ITemplateResult {
 
 export function html(
   strings: TemplateStringsArray,
-  ...values: unknown[]
+  ...values: any[]
 ): ITemplateResult {
   return { strings, values };
 }

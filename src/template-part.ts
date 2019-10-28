@@ -1,4 +1,4 @@
-import { ATTR_MARK, PLACEHOLDER_MARK } from './constants';
+import { ATTR_MARK } from './constants';
 
 export interface ITemplatePart {
   attr?: string;

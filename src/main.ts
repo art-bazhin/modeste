@@ -1,6 +1,5 @@
-import { html } from './template-result';
-import { createTemplateInstance } from './template-instance';
-import { render } from './render';
+import { html } from '../src/template-result';
+import { render } from '../src/render';
 
 let measures: {
   [key: string]: { count: number; total: number; last: number };
@@ -127,5 +126,3 @@ function r(key?: string) {
 }
 
 r();
-
-// if (fragment) document.body.appendChild(fragment);

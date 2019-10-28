@@ -11,12 +11,8 @@ export const TEMPLATE_INSTANCE_KEY = '__mdstTemplateInstance';
 export const EVENTS_KEY = '__mdstEvents';
 export const MARK_TYPE_KEY = '__mdstMarkType';
 
-export enum MarkTypes {
-  Open = 1,
-  Close = 2
-}
+export const OPEN_MARK_ID = 1;
+export const CLOSE_MARK_ID = 2;
 
-export enum NodeTypes {
-  Text = 1,
-  Element = 2
-}
+export const TEXT_NODE_ID = 1;
+export const ELEMENT_NODE_ID = 2;

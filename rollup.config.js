@@ -1,6 +1,5 @@
 import { uglify } from 'rollup-plugin-uglify';
-import { dts } from 'rollup-plugin-dts';
-import typescript from 'rollup-plugin-typescript2';
+import ts from 'rollup-plugin-ts';
 import pkg from './package.json';
 
 export default [
@@ -12,28 +11,30 @@ export default [
       file: pkg.browser,
       format: 'iife'
     },
-    plugins: [typescript(), uglify()]
+    plugins: [
+      ts({
+        tsconfig: {
+          target: 'ES5',
+          module: 'es2015',
+          strict: true
+        }
+      }),
+      uglify()
+    ]
   },
 
   {
     input: 'src/main.ts',
-    plugins: [typescript()],
+    plugins: [
+      ts({
+        tsconfig: {
+          target: 'ES2015',
+          module: 'es2015',
+          declaration: true,
+          strict: true
+        }
+      })
+    ],
     output: { file: pkg.main, format: 'es' }
-  },
-
-  {
-    input: 'src/main.ts',
-    plugins: [dts()],
-    output: { file: pkg.types, format: 'es' }
   }
-
-  // {
-  //   input: 'sandbox/test.ts',
-  //   plugins: [typescript(), uglify()],
-  //   output: {
-  //     name: 'app',
-  //     file: 'sandbox/test.js',
-  //     format: 'iife'
-  //   }
-  // }
 ];

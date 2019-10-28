@@ -1,13 +1,21 @@
 import {
   TEMPLATE_INSTANCE_KEY,
   MARK_TYPE_KEY,
-  MarkTypes,
-  EVENTS_KEY,
-  NodeTypes
+  OPEN_MARK_ID,
+  CLOSE_MARK_ID
 } from './constants';
-import { ITemplateResult, isTemplateResult } from './template-result';
+import { ITemplateResult } from './template-result';
 import { ITemplatePart } from './template-part';
 import { getTemplate, ITemplate } from './template';
+import {
+  getPreviousSibling,
+  insertBefore,
+  processEvent,
+  processAttr,
+  removeNode,
+  updateNode,
+  getNodeFromPosition
+} from './dom';
 
 export interface ITemplateInstance {
   template: ITemplate;
@@ -61,8 +69,8 @@ export function createTemplateInstance(
   openMark[TEMPLATE_INSTANCE_KEY] = instance;
   closeMark[TEMPLATE_INSTANCE_KEY] = instance;
 
-  openMark[MARK_TYPE_KEY] = MarkTypes.Open;
-  closeMark[MARK_TYPE_KEY] = MarkTypes.Close;
+  openMark[MARK_TYPE_KEY] = OPEN_MARK_ID;
+  closeMark[MARK_TYPE_KEY] = CLOSE_MARK_ID;
 
   return instance;
 }
@@ -117,134 +125,7 @@ export function updateTemplateInstance(
   return instance.closeMark;
 }
 
-function getPreviousSibling(node: Node) {
-  if (isCloseMark(node))
-    return (node as any)[TEMPLATE_INSTANCE_KEY].openMark
-      .previousSibling as Node;
-  return node.previousSibling;
-}
-
 function valueToArray(value: any) {
   if (Array.isArray(value)) return value as any[];
   return [value];
-}
-
-function isNotNullOrUndefined(val: any) {
-  return val !== null && val !== undefined;
-}
-
-function updateNode(value: any, node: Node) {
-  const type = hasSameType(value, node);
-
-  if (!type) {
-    const newNode = insertBefore(value, node.nextSibling!);
-    removeNode(node);
-    return newNode;
-  } else if (type === NodeTypes.Text) {
-    (node as Text).textContent = value;
-    return node;
-  } else {
-    return updateTemplateInstance(
-      (node as any)[TEMPLATE_INSTANCE_KEY] as ITemplateInstance,
-      value.values
-    );
-  }
-}
-
-function removeNode(node: Node) {
-  const parent = node.parentNode!;
-
-  if (isCloseMark(node)) {
-    let instance = getTemplateInstanceFromNode(node);
-
-    while (
-      !isOpenMark(node) ||
-      instance !== getTemplateInstanceFromNode(node)
-    ) {
-      let next = node.previousSibling!;
-      parent.removeChild(node);
-      node = next;
-    }
-  }
-
-  parent.removeChild(node);
-}
-
-function getTemplateInstanceFromNode(node: Node) {
-  return (node as any)[TEMPLATE_INSTANCE_KEY];
-}
-
-function processAttr(attr: string, value: any, node: Node) {
-  const target = node as HTMLElement;
-  if (value === true) {
-    target.setAttribute(attr, '');
-  } else if (value === false) {
-    target.removeAttribute(attr);
-  } else {
-    target.setAttribute(attr, value as string);
-  }
-}
-
-function processEvent(event: string, value: any, node: Node) {
-  const target = node as any;
-
-  if (!target[EVENTS_KEY]) {
-    target[EVENTS_KEY] = {};
-    target.removeAttribute(event);
-  }
-
-  const str = value.toString();
-
-  if (target[EVENTS_KEY][event] === str) return;
-
-  target[event] = value;
-  target[EVENTS_KEY][event] = str;
-}
-
-function getNodeFromPosition(
-  position: number[],
-  parent: Node,
-  level = 0
-): Node {
-  const child = parent.childNodes[position[level]];
-
-  if (position.length - 1 === level) return child;
-  return getNodeFromPosition(position, child, level + 1);
-}
-
-function insertBefore(value: any, refChild: Node) {
-  const parent = refChild.parentElement!;
-
-  if (isCloseMark(refChild))
-    refChild = (refChild as any)[TEMPLATE_INSTANCE_KEY].openMark as Node;
-
-  if (isTemplateResult(value)) {
-    const instance = createTemplateInstance(value);
-    parent.insertBefore(instance.fragment, refChild);
-    return instance.closeMark;
-  } else if (isNotNullOrUndefined(value)) {
-    return parent.insertBefore(document.createTextNode('' + value), refChild);
-  }
-}
-
-function hasSameType(value: any, node: Node) {
-  const isRes = isTemplateResult(value);
-
-  if (node.nodeType === Node.TEXT_NODE && !isRes) return NodeTypes.Text;
-  else if (
-    isRes &&
-    isCloseMark(node) &&
-    (node as any)[TEMPLATE_INSTANCE_KEY].template === getTemplate(value)
-  )
-    return NodeTypes.Element;
-
-  return false;
-}
-
-function isOpenMark(node: Node) {
-  return (node as any)[MARK_TYPE_KEY] === MarkTypes.Open;
-}
-
-function isCloseMark(node: Node) {
-  return (node as any)[MARK_TYPE_KEY] === MarkTypes.Close;
 }

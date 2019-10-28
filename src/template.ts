@@ -31,11 +31,6 @@ export function getTemplate(res: ITemplateResult): ITemplate {
     let parent = node.parentNode;
 
     if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
-      // const placeholder = document.createTextNode('');
-
-      // node.parentNode!.replaceChild(placeholder, node);
-      // node = placeholder.nextSibling;
-
       parts.push({ position: position.slice() });
       node = node.nextSibling;
     } else if (isElementNode(node)) {
@@ -53,8 +48,9 @@ export function getTemplate(res: ITemplateResult): ITemplate {
       node = node.nextSibling;
     }
 
-    if (!node && parent && parent.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
+    while (!node && parent && parent.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) {
       node = parent.nextSibling;
+      parent = parent.parentNode;
       position = position.slice(0, position.length - 1);
     }
 
