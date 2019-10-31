@@ -1,4 +1,4 @@
-import { PLACEHOLDER_MARK, ATTR_MARK, MARK } from './constants';
+import { PLACEHOLDER_MARK, ATTR_MARK, MARK, NODE_PART_ID } from './constants';
 import { ITemplateResult, getTemplateResultHTML } from './template-result';
 import { ITemplatePart, getTemplatePartsFromElement } from './template-part';
 import { isCommentNode, isElementNode } from './dom';
@@ -31,7 +31,7 @@ export function getTemplate(res: ITemplateResult): ITemplate {
     let parent = node.parentNode;
 
     if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
-      parts.push({ position: position.slice() });
+      parts.push({ type: NODE_PART_ID, position: position.slice() });
       node = node.nextSibling;
     } else if (isElementNode(node)) {
       if (node.hasAttribute(ATTR_MARK)) {

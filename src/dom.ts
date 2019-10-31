@@ -39,7 +39,7 @@ export function updateNode(value: any, node: Node) {
   const type = hasSameType(value, node);
 
   if (!type) {
-    const newNode = insertBefore(value, node.nextSibling!);
+    const newNode = insertBefore(value, node);
     removeNode(node);
     return newNode;
   } else if (type === TEXT_NODE_ID) {
@@ -49,7 +49,7 @@ export function updateNode(value: any, node: Node) {
     return updateTemplateInstance(
       (node as any)[TEMPLATE_INSTANCE_KEY] as ITemplateInstance,
       value.values
-    );
+    ).openMark as Node;
   }
 }
 
@@ -72,11 +72,10 @@ export function removeNode(node: Node) {
   parent.removeChild(node);
 }
 
-export function getPreviousSibling(node: Node) {
-  if (isCloseMark(node))
-    return (node as any)[TEMPLATE_INSTANCE_KEY].openMark
-      .previousSibling as Node;
-  return node.previousSibling;
+export function getNextSibling(node: Node) {
+  if (isOpenMark(node))
+    return (node as any)[TEMPLATE_INSTANCE_KEY].closeMark.nextSibling as Node;
+  return node.nextSibling;
 }
 
 export function getTemplateInstanceFromNode(node: Node) {
@@ -94,19 +93,15 @@ export function processAttr(attr: string, value: any, node: Node) {
   }
 }
 
-export function processEvent(event: string, value: any, node: Node) {
-  const target = node as any;
-
-  if (!target[EVENTS_KEY]) {
-    target[EVENTS_KEY] = {};
-    target.removeAttribute(event);
-  }
-
-  const str = value.toString();
-  if (target[EVENTS_KEY][event] === str) return;
-
-  target[event] = value;
-  target[EVENTS_KEY][event] = str;
+export function processEvent(
+  event: string,
+  node: Node,
+  instance: ITemplateInstance,
+  index: number
+) {
+  node.addEventListener(event, (e: any) => {
+    if (instance.values[index]) instance.values[index](e);
+  });
 }
 
 export function getNodeFromPosition(
@@ -120,16 +115,13 @@ export function getNodeFromPosition(
   return getNodeFromPosition(position, child, level + 1);
 }
 
-export function insertBefore(value: any, refChild: Node) {
+export function insertBefore(value: any, refChild: Node): Node {
   const parent = refChild.parentElement!;
-
-  if (isCloseMark(refChild))
-    refChild = (refChild as any)[TEMPLATE_INSTANCE_KEY].openMark as Node;
 
   if (isTemplateResult(value)) {
     const instance = createTemplateInstance(value);
     parent.insertBefore(instance.fragment, refChild);
-    return instance.closeMark;
+    return instance.openMark;
   } else {
     return parent.insertBefore(document.createTextNode(value), refChild);
   }
@@ -141,7 +133,7 @@ export function hasSameType(value: any, node: Node) {
   if (node.nodeType === Node.TEXT_NODE && !isRes) return TEXT_NODE_ID;
   else if (
     isRes &&
-    isCloseMark(node) &&
+    isOpenMark(node) &&
     (node as any)[TEMPLATE_INSTANCE_KEY].template === getTemplate(value)
   )
     return ELEMENT_NODE_ID;
