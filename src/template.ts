@@ -3,7 +3,9 @@ import { ITemplateResult, getTemplateResultHTML } from './template-result';
 import { ITemplatePart, getTemplatePartsFromElement } from './template-part';
 import { isCommentNode, isElementNode } from './dom';
 
-const templatesMap = new Map<TemplateStringsArray, ITemplate>();
+const templatesMap = WeakMap
+  ? new WeakMap<TemplateStringsArray, ITemplate>()
+  : new Map<TemplateStringsArray, ITemplate>();
 
 export interface ITemplate {
   fragment: DocumentFragment;

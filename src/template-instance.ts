@@ -16,8 +16,6 @@ import { getTemplate, ITemplate } from './template';
 import {
   getNextSibling,
   insertBefore,
-  processEvent,
-  processAttr,
   removeNode,
   updateNode,
   getNodeFromPosition
@@ -104,7 +102,8 @@ export function updateTemplateInstance(
       const oldValueArray = valueToArray(oldValue);
 
       const min = Math.min(valueArray.length, oldValueArray.length);
-      const dif = Math.abs(valueArray.length - oldValueArray.length);
+      const max = Math.max(valueArray.length, oldValueArray.length);
+      const dif = max - min;
 
       let current = (node as any)[NODE_REF_KEY] as Node;
 
@@ -115,7 +114,7 @@ export function updateTemplateInstance(
       }
 
       if (valueArray.length > oldValueArray.length) {
-        for (let i = 0; i < dif; i++) {
+        for (let i = min; i < max; i++) {
           insertBefore(valueArray[i], node);
         }
       } else {
@@ -123,7 +122,7 @@ export function updateTemplateInstance(
 
         for (let i = 0; i < dif; i++) {
           next = getNextSibling(current)!;
-          removeNode(getNextSibling(current)!);
+          removeNode(current);
           current = next;
         }
       }
@@ -136,6 +135,28 @@ export function updateTemplateInstance(
 }
 
 function valueToArray(value: any) {
-  if (Array.isArray(value)) return value as any[];
+  if (Array.isArray(value)) return value.length ? (value as any[]) : [''];
   return [value];
+}
+
+function processAttr(attr: string, value: any, node: Node) {
+  const target = node as HTMLElement;
+  if (value === true) {
+    target.setAttribute(attr, '');
+  } else if (value === false) {
+    target.removeAttribute(attr);
+  } else {
+    target.setAttribute(attr, value as string);
+  }
+}
+
+function processEvent(
+  event: string,
+  node: Node,
+  instance: ITemplateInstance,
+  index: number
+) {
+  node.addEventListener(event, (e: any) => {
+    if (instance.values[index]) instance.values[index](e);
+  });
 }

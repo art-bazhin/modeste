@@ -33,6 +33,8 @@ export default modeste;
 //   name: string;
 //   age: number;
 //   active: boolean;
+//   x?: number;
+//   y?: number;
 // }
 
 // let users: IUser[] = [
@@ -58,12 +60,16 @@ export default modeste;
 //   }
 // ];
 
-// for (let i = 0; i < 4000; i++) {
-//   users.push({
-//     name: 'test',
-//     age: i,
-//     active: true
-//   });
+// function fill() {
+//   for (let i = 0; i < 400; i++) {
+//     users.push({
+//       name: 'test',
+//       age: i,
+//       active: true
+//     });
+//   }
+
+//   r('fill');
 // }
 
 // function toggleUser(user: IUser) {
@@ -76,8 +82,19 @@ export default modeste;
 //   r('reverse');
 // }
 
+// function clean() {
+//   users = [];
+//   r('clean');
+// }
+
 // function setUserName(user: IUser, name: string) {
 //   user.name = name;
+//   r();
+// }
+
+// function move(user: IUser, x: number, y: number) {
+//   user.x = x;
+//   user.y = y;
 //   r();
 // }
 
@@ -87,11 +104,14 @@ export default modeste;
 
 // let card = (user: IUser) => {
 //   function toggle() {
-//     toggleUser(user);
+//     for (let i = 0; i < 4; i++) toggleUser(user);
 //   }
 
 //   return html`
-//     <div class=${'card' + (user.active ? '' : ' inactive')}>
+//     <div
+//       onmousemove=${(e: any) => move(user, e.clientX, e.clientY)}
+//       class=${'card' + (user.active ? '' : ' inactive')}
+//     >
 //       <div>
 //         <input
 //           type="text"
@@ -104,6 +124,7 @@ export default modeste;
 //       <p>Age: ${user.age}</p>
 //       <p>Test: ${users[0].name}</p>
 //       <p>${user.active ? 'Active' : 'Inactive'}</p>
+//       <p>X: ${user.x}, Y: ${user.y}</p>
 //       ${button({ onclick: toggle })}
 //     </div>
 //   `;
@@ -114,7 +135,9 @@ export default modeste;
 
 //   return html`
 //     <div>
+//       <button onclick=${fill}>Fill</button>
 //       <button onclick=${reverse}>Reverse</button>
+//       <button onclick=${clean}>Clean</button>
 //     </div>
 //     <div>
 //       ${cards}

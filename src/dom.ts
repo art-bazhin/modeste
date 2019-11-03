@@ -6,8 +6,7 @@ import {
 import {
   MARK_TYPE_KEY,
   TEMPLATE_INSTANCE_KEY,
-  EVENTS_KEY,
-  ELEMENT_NODE_ID,
+  TEMPLATE_NODE_ID,
   CLOSE_MARK_ID,
   TEXT_NODE_ID,
   OPEN_MARK_ID
@@ -43,7 +42,7 @@ export function updateNode(value: any, node: Node) {
     removeNode(node);
     return newNode;
   } else if (type === TEXT_NODE_ID) {
-    (node as Text).textContent = value;
+    (node as Text).textContent = value + '';
     return node;
   } else {
     return updateTemplateInstance(
@@ -56,14 +55,14 @@ export function updateNode(value: any, node: Node) {
 export function removeNode(node: Node) {
   const parent = node.parentNode!;
 
-  if (isCloseMark(node)) {
+  if (isOpenMark(node)) {
     let instance = getTemplateInstanceFromNode(node);
 
     while (
-      !isOpenMark(node) ||
+      !isCloseMark(node) ||
       instance !== getTemplateInstanceFromNode(node)
     ) {
-      let next = node.previousSibling!;
+      let next = node.nextSibling!;
       parent.removeChild(node);
       node = next;
     }
@@ -80,28 +79,6 @@ export function getNextSibling(node: Node) {
 
 export function getTemplateInstanceFromNode(node: Node) {
   return (node as any)[TEMPLATE_INSTANCE_KEY];
-}
-
-export function processAttr(attr: string, value: any, node: Node) {
-  const target = node as HTMLElement;
-  if (value === true) {
-    target.setAttribute(attr, '');
-  } else if (value === false) {
-    target.removeAttribute(attr);
-  } else {
-    target.setAttribute(attr, value as string);
-  }
-}
-
-export function processEvent(
-  event: string,
-  node: Node,
-  instance: ITemplateInstance,
-  index: number
-) {
-  node.addEventListener(event, (e: any) => {
-    if (instance.values[index]) instance.values[index](e);
-  });
 }
 
 export function getNodeFromPosition(
@@ -136,7 +113,7 @@ export function hasSameType(value: any, node: Node) {
     isOpenMark(node) &&
     (node as any)[TEMPLATE_INSTANCE_KEY].template === getTemplate(value)
   )
-    return ELEMENT_NODE_ID;
+    return TEMPLATE_NODE_ID;
 
   return false;
 }
