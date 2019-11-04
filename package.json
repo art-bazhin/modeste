@@ -1,10 +1,11 @@
 {
   "name": "modeste",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "main": "dist/modeste.js",
   "browser": "dist/modeste.min.js",
   "types": "dist/modeste.d.ts",
   "devDependencies": {
+    "cz-conventional-changelog": "^3.0.2",
     "prettier": "^1.16.4",
     "rollup": "^1.23.1",
     "rollup-plugin-ts": "^0.2.0",
@@ -20,5 +21,10 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
