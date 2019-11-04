@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.6](https://github.com/art-bazhin/modeste/compare/v0.0.5...v0.0.6) (2019-11-04)
+
+
+### CI
+
+* set skip_cleanup to true ([e70a4af](https://github.com/art-bazhin/modeste/commit/e70a4af725774fd2f1026bebe539919f3f9b798d))
+
 ### [0.0.5](https://github.com/art-bazhin/modeste/compare/v0.0.4...v0.0.5) (2019-11-04)
 
 
