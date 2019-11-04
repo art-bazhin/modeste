@@ -93,15 +93,15 @@ export function getNodeFromPosition(
 }
 
 export function insertBefore(value: any, refChild: Node): Node {
-  const parent = refChild.parentElement!;
+  const parent = refChild.parentNode!;
 
   if (isTemplateResult(value)) {
     const instance = createTemplateInstance(value);
     parent.insertBefore(instance.fragment, refChild);
     return instance.openMark;
-  } else {
-    return parent.insertBefore(document.createTextNode(value), refChild);
   }
+
+  return parent.insertBefore(document.createTextNode(value), refChild);
 }
 
 export function hasSameType(value: any, node: Node) {
