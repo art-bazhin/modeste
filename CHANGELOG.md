@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.3](https://github.com/art-bazhin/modeste/compare/v0.0.2...v0.0.3) (2019-11-04)
+
+
+### Bug Fixes
+
+* deploy test ([44d8c69](https://github.com/art-bazhin/modeste/commit/44d8c69b0afb56aa2f14a71a8459438eb5eec9d9))
+
+
+### CI
+
+* **.travis.yml:** update travis config ([44bb329](https://github.com/art-bazhin/modeste/commit/44bb3296fabcf17c3186ae7c44c8e458cdbbe6f8))
+* update travis config ([84674a7](https://github.com/art-bazhin/modeste/commit/84674a7432887fdbeccf1cba816e54d56b15b79d))
+
 ### [0.0.2](https://github.com/art-bazhin/modeste/compare/v0.0.1...v0.0.2) (2019-11-04)
 
 
