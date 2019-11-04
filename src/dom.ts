@@ -4,8 +4,8 @@ import {
   createTemplateInstance
 } from './template-instance';
 import {
-  MARK_TYPE_KEY,
   TEMPLATE_INSTANCE_KEY,
+  MARK_TYPE_KEY,
   TEMPLATE_NODE_ID,
   CLOSE_MARK_ID,
   TEXT_NODE_ID,
