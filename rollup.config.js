@@ -8,7 +8,7 @@ export default [
     input: 'src/main.ts',
     output: {
       name: 'modeste',
-      file: pkg.browser,
+      file: 'dist/modeste.iife.min.js',
       format: 'iife'
     },
     plugins: [

@@ -6,7 +6,6 @@
   "bugs": "https://github.com/art-bazhin/modeste/issues",
   "version": "0.1.0",
   "main": "dist/modeste.js",
-  "browser": "dist/modeste.min.js",
   "types": "dist/modeste.d.ts",
   "devDependencies": {
     "cz-conventional-changelog": "^3.0.2",
