@@ -8,9 +8,9 @@ import {
 import { ITemplateResult } from './template-result';
 import {
   ITemplatePart,
+  isNodePart,
   isAttrPart,
-  isEventPart,
-  isNodePart
+  isEventPart
 } from './template-part';
 import { getTemplate, ITemplate } from './template';
 import {
