@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.2](https://github.com/art-bazhin/modeste/compare/v0.0.1...v0.0.2) (2019-11-04)
+
+
+### Features
+
+* versioning test ([4cb8832](https://github.com/art-bazhin/modeste/commit/4cb8832da32b650665118d3e9463e4fa03481ab8))
+
 ### 0.0.1 (2019-11-04)
 
 
