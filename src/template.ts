@@ -18,9 +18,22 @@ export function getTemplate(res: ITemplateResult): ITemplate {
   if (templatesMap.has(strings)) return templatesMap.get(strings) as ITemplate;
 
   const templateElement = document.createElement('template');
-  templateElement.innerHTML = getTemplateResultHTML(res);
+  let html = getTemplateResultHTML(res);
+
+  if (res.isSVG) html = '<svg>' + html + '</svg>';
+  templateElement.innerHTML = html;
 
   const fragment = templateElement.content;
+
+  if (res.isSVG) {
+    const svgRoot = fragment.firstChild!;
+
+    while (svgRoot.firstChild) {
+      fragment.appendChild(svgRoot.firstChild);
+    }
+
+    fragment.removeChild(svgRoot);
+  }
 
   fragment.appendChild(document.createComment(MARK));
   fragment.insertBefore(document.createComment(MARK), fragment.firstChild);

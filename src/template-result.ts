@@ -16,6 +16,7 @@ const attrRegEx = new RegExp(
 export interface ITemplateResult {
   strings: TemplateStringsArray;
   values: any[];
+  isSVG?: boolean;
 }
 
 export function getTemplateResultHTML(res: ITemplateResult) {
@@ -41,9 +42,16 @@ export function isTemplateResult(res: any): res is ITemplateResult {
   return !!(res && res.values && res.strings);
 }
 
-export function html(
+export function createTemplateResult(
   strings: TemplateStringsArray,
   ...values: any[]
 ): ITemplateResult {
   return { strings, values };
+}
+
+export function createSVGTemplateResult(
+  strings: TemplateStringsArray,
+  ...values: any[]
+): ITemplateResult {
+  return { strings, values, isSVG: true };
 }
