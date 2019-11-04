@@ -3,8 +3,8 @@ import {
   createTemplateInstance,
   updateTemplateInstance
 } from './template-instance';
-import { ITemplateResult } from './template-result';
 import { TEMPLATE_INSTANCE_KEY } from './constants';
+import { ITemplateResult } from './template-result';
 import { getTemplate } from './template';
 
 export function render(res: ITemplateResult, container: HTMLElement) {
