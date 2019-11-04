@@ -1,6 +1,9 @@
 language: node_js
 node_js:
-  - '11'
-  - '10'
-  - '8'
-  - '6'
+  - 'node'
+install: npm install
+script: npm run build
+deploy:
+  provider: npm
+  email: $NPM_EMAIL
+  api_key: $NPM_TOKEN
