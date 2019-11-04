@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/art-bazhin/modeste/compare/v0.1.0...v0.1.1) (2019-11-04)
+
+
+### Build System
+
+* remove browser field in package.json ([4453b80](https://github.com/art-bazhin/modeste/commit/4453b8034c9105582e4dd506c9bd394cde7b11fd))
+
 ## [0.1.0](https://github.com/art-bazhin/modeste/compare/v0.0.7...v0.1.0) (2019-11-04)
 
 
