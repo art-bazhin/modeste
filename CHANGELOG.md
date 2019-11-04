@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/art-bazhin/modeste/compare/v0.0.7...v0.1.0) (2019-11-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* separate export of html and render functions
+
+### Feature Improvements
+
+* update module export ([e0ed84e](https://github.com/art-bazhin/modeste/commit/e0ed84e8779ee98ea333403c46580aa59c5259cf))
+
 ### [0.0.7](https://github.com/art-bazhin/modeste/compare/v0.0.6...v0.0.7) (2019-11-04)
 
 ### [0.0.6](https://github.com/art-bazhin/modeste/compare/v0.0.5...v0.0.6) (2019-11-04)
