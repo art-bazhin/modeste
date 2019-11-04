@@ -21,3 +21,4 @@ export const TEMPLATE_NODE_ID = 2;
 export const NODE_PART_ID = 1;
 export const ATTR_PART_ID = 2;
 export const EVENT_PART_ID = 3;
+export const REF_PART_ID = 4;

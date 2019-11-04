@@ -3,15 +3,14 @@ import {
   MARK_TYPE_KEY,
   OPEN_MARK_ID,
   CLOSE_MARK_ID,
-  NODE_REF_KEY
+  NODE_REF_KEY,
+  ATTR_PART_ID,
+  EVENT_PART_ID,
+  REF_PART_ID,
+  NODE_PART_ID
 } from './constants';
 import { ITemplateResult } from './template-result';
-import {
-  ITemplatePart,
-  isNodePart,
-  isAttrPart,
-  isEventPart
-} from './template-part';
+import { ITemplatePart } from './template-part';
 import { getTemplate, ITemplate } from './template';
 import {
   getNextSibling,
@@ -57,17 +56,23 @@ export function createTemplateInstance(
     const value = values[i];
     const node = nodes[i];
 
-    if (isAttrPart(part)) {
-      processAttr(part.name!, value, node);
-    } else if (isEventPart(part)) {
-      processEvent(part.name!, node, instance, i);
-    } else {
-      const arr = valueToArray(value);
+    switch (part.type) {
+      case ATTR_PART_ID:
+        processAttr(part.name!, value, node);
+        break;
+      case EVENT_PART_ID:
+        processEvent(part.name!, node, instance, i);
+        break;
+      case REF_PART_ID:
+        processRef(value, node);
+        break;
+      default:
+        const arr = valueToArray(value);
 
-      for (let i = 0; i < arr.length; i++) {
-        const n = insertBefore(arr[i], node);
-        if (!i) (node as any)[NODE_REF_KEY] = n;
-      }
+        for (let i = 0; i < arr.length; i++) {
+          const n = insertBefore(arr[i], node);
+          if (!i) (node as any)[NODE_REF_KEY] = n;
+        }
     }
   }
 
@@ -95,37 +100,42 @@ export function updateTemplateInstance(
     const node = instance.nodes[i];
     const part = parts[i];
 
-    if (isAttrPart(part)) {
-      processAttr(part.name!, value, node);
-    } else if (isNodePart(part)) {
-      const valueArray = valueToArray(value);
-      const oldValueArray = valueToArray(oldValue);
+    switch (part.type) {
+      case ATTR_PART_ID:
+        processAttr(part.name!, value, node);
+        break;
+      case REF_PART_ID:
+        processRef(value, node);
+        break;
+      case NODE_PART_ID:
+        const valueArray = valueToArray(value);
+        const oldValueArray = valueToArray(oldValue);
 
-      const min = Math.min(valueArray.length, oldValueArray.length);
-      const max = Math.max(valueArray.length, oldValueArray.length);
-      const dif = max - min;
+        const min = Math.min(valueArray.length, oldValueArray.length);
+        const max = Math.max(valueArray.length, oldValueArray.length);
+        const dif = max - min;
 
-      let current = (node as any)[NODE_REF_KEY] as Node;
+        let current = (node as any)[NODE_REF_KEY] as Node;
 
-      for (let i = 0; i < min; i++) {
-        const n = updateNode(valueArray[i], current);
-        if (!i) (node as any)[NODE_REF_KEY] = n;
-        current = getNextSibling(n)!;
-      }
-
-      if (valueArray.length > oldValueArray.length) {
-        for (let i = min; i < max; i++) {
-          insertBefore(valueArray[i], node);
+        for (let i = 0; i < min; i++) {
+          const n = updateNode(valueArray[i], current);
+          if (!i) (node as any)[NODE_REF_KEY] = n;
+          current = getNextSibling(n)!;
         }
-      } else {
-        let next: Node;
 
-        for (let i = 0; i < dif; i++) {
-          next = getNextSibling(current)!;
-          removeNode(current);
-          current = next;
+        if (valueArray.length > oldValueArray.length) {
+          for (let i = min; i < max; i++) {
+            insertBefore(valueArray[i], node);
+          }
+        } else {
+          let next: Node;
+
+          for (let i = 0; i < dif; i++) {
+            next = getNextSibling(current)!;
+            removeNode(current);
+            current = next;
+          }
         }
-      }
     }
   }
 
@@ -159,4 +169,8 @@ function processEvent(
   node.addEventListener(event, (e: any) => {
     if (instance.values[index]) instance.values[index](e);
   });
+}
+
+function processRef(value: any, node: Node) {
+  if (value) value(node);
 }
