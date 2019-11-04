@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/art-bazhin/modeste/compare/v0.1.2...v0.1.3) (2019-11-04)
+
+
+### Features
+
+* add SVG support ([bad3d3d](https://github.com/art-bazhin/modeste/commit/bad3d3dc87e93edc2ed20b57282b3a9e03eb3e7c))
+
 ### [0.1.2](https://github.com/art-bazhin/modeste/compare/v0.1.1...v0.1.2) (2019-11-04)
 
 
