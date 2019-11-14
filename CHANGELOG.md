@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/art-bazhin/modeste/compare/v0.1.4...v0.1.5) (2019-11-14)
+
+
+### Bug Fixes
+
+* fix attributes order bug in IE ([c9526b7](https://github.com/art-bazhin/modeste/commit/c9526b74d979d6ef53fead84febcbfe11cd16a7c))
+
+
+### Feature Improvements
+
+* change value attribute behavior ([ed75ab6](https://github.com/art-bazhin/modeste/commit/ed75ab6658508e29d5a1ac4eb9b787d46d8d79fb))
+
 ### [0.1.4](https://github.com/art-bazhin/modeste/compare/v0.1.3...v0.1.4) (2019-11-04)
 
 
