@@ -7,7 +7,8 @@ import {
   ATTR_PART_ID,
   EVENT_PART_ID,
   REF_PART_ID,
-  NODE_PART_ID
+  NODE_PART_ID,
+  REF_ATTR_NAME
 } from './constants';
 import { ITemplateResult } from './template-result';
 import { ITemplatePart } from './template-part';
@@ -54,7 +55,7 @@ export function createTemplateInstance(
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
     const value = values[i];
-    const node = nodes[i];
+    const node = nodes[i] as Element;
 
     switch (part.type) {
       case ATTR_PART_ID:
@@ -64,7 +65,7 @@ export function createTemplateInstance(
         processEvent(part.name!, node, instance, i);
         break;
       case REF_PART_ID:
-        processRef(value, node);
+        processRef(value, node, true);
         break;
       default:
         const arr = valueToArray(value);
@@ -97,7 +98,7 @@ export function updateTemplateInstance(
 
     if (value === oldValue) continue;
 
-    const node = instance.nodes[i];
+    const node = instance.nodes[i] as Element;
     const part = parts[i];
 
     switch (part.type) {
@@ -149,14 +150,13 @@ function valueToArray(value: any) {
   return [value];
 }
 
-function processAttr(attr: string, value: any, node: Node) {
-  const target = node as HTMLElement;
+function processAttr(attr: string, value: any, node: Element) {
   if (value === true) {
-    target.setAttribute(attr, '');
+    node.setAttribute(attr, '');
   } else if (value === false) {
-    target.removeAttribute(attr);
+    node.removeAttribute(attr);
   } else {
-    target.setAttribute(attr, value as string);
+    node.setAttribute(attr, value as string);
   }
 }
 
@@ -169,8 +169,11 @@ function processEvent(
   node.addEventListener(event, (e: any) => {
     if (instance.values[index]) instance.values[index](e);
   });
+
+  (node as Element).removeAttribute('on' + event);
 }
 
-function processRef(value: any, node: Node) {
+function processRef(value: any, node: Element, isFirstRender?: boolean) {
   if (value) value(node);
+  if (isFirstRender) node.removeAttribute(REF_ATTR_NAME);
 }

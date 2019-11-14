@@ -1,4 +1,9 @@
-import { PLACEHOLDER_MARK, ATTR_MARK, PLACEHOLDER_COMMENT } from './constants';
+import {
+  PLACEHOLDER_MARK,
+  ATTR_MARK,
+  PLACEHOLDER_COMMENT,
+  ATTR_NUM_SEPARATOR
+} from './constants';
 
 const markRegEx = new RegExp(PLACEHOLDER_MARK, 'gm');
 const tagRegEx = /<[a-z][a-z\d-]*([^<>]|("[^"]*")|('[^']*'))*>/gm;
@@ -13,6 +18,19 @@ const attrRegEx = new RegExp(
   'gm'
 );
 
+function replaceTag(tag: string) {
+  let num = 0;
+  let tagProcessed = tag.replace(attrRegEx, function(attr, p1) {
+    return p1 + '=' + ATTR_MARK + ATTR_NUM_SEPARATOR + num++;
+  });
+
+  if (tagProcessed !== tag) {
+    tagProcessed = tagProcessed.replace(/<[^\s\n]+/, '$& ' + ATTR_MARK);
+  }
+
+  return tagProcessed;
+}
+
 export interface ITemplateResult {
   strings: TemplateStringsArray;
   values: any[];
@@ -20,21 +38,7 @@ export interface ITemplateResult {
 }
 
 export function getTemplateResultHTML(res: ITemplateResult) {
-  let html = res.strings.join(PLACEHOLDER_MARK);
-
-  html = html.replace(tagRegEx, function(tag) {
-    let tagProcessed = tag.replace(attrRegEx, '$1=' + ATTR_MARK);
-
-    if (tagProcessed !== tag) {
-      tagProcessed = tagProcessed.replace(
-        ATTR_MARK,
-        ATTR_MARK + ' ' + ATTR_MARK
-      );
-    }
-
-    return tagProcessed;
-  });
-
+  let html = res.strings.join(PLACEHOLDER_MARK).replace(tagRegEx, replaceTag);
   return html.replace(markRegEx, PLACEHOLDER_COMMENT);
 }
 
