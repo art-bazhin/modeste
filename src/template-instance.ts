@@ -151,12 +151,14 @@ function valueToArray(value: any) {
 }
 
 function processAttr(attr: string, value: any, node: Element) {
-  if (value === true) {
-    node.setAttribute(attr, '');
-  } else if (value === false) {
-    node.removeAttribute(attr);
-  } else {
-    node.setAttribute(attr, value as string);
+  switch (value) {
+    case true:
+      return node.setAttribute(attr, '');
+    case false:
+      return node.setAttribute(attr, '');
+    default:
+      if (attr === 'value') (node as any).value = value;
+      node.setAttribute(attr, value as string);
   }
 }
 
