@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.7](https://github.com/art-bazhin/modeste/compare/v0.1.6...v0.1.7) (2019-11-15)
+
+
+### Bug Fixes
+
+* fix empty text node bug in IE ([0d65804](https://github.com/art-bazhin/modeste/commit/0d65804abe3fafcf8750c0d0ef48fb1a7582df9b))
+
 ### [0.1.6](https://github.com/art-bazhin/modeste/compare/v0.1.5...v0.1.6) (2019-11-15)
 
 
