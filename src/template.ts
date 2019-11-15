@@ -3,6 +3,11 @@ import { ITemplateResult, getTemplateResultHTML } from './template-result';
 import { ITemplatePart, getTemplatePartsFromElement } from './template-part';
 import { isCommentNode, isElementNode } from './dom';
 
+const testNode = document.createElement('div');
+testNode.appendChild(document.createTextNode(''));
+
+const isIE = !testNode.cloneNode(true).firstChild;
+
 const templatesMap = new WeakMap<TemplateStringsArray, ITemplate>();
 
 export interface ITemplate {
@@ -33,8 +38,8 @@ export function getTemplate(res: ITemplateResult): ITemplate {
     fragment.removeChild(svgRoot);
   }
 
-  fragment.appendChild(createEmptyTextNode());
-  fragment.insertBefore(createEmptyTextNode(), fragment.firstChild);
+  fragment.appendChild(createMarkNode());
+  fragment.insertBefore(createMarkNode(), fragment.firstChild);
 
   let node = fragment.firstChild as Node | null;
   let position = [0];
@@ -45,7 +50,7 @@ export function getTemplate(res: ITemplateResult): ITemplate {
 
     if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
       parts.push({ type: NODE_PART_ID, position: position.slice() });
-      node.parentNode!.replaceChild(createEmptyTextNode(), node);
+      node.parentNode!.replaceChild(createMarkNode(), node);
       node = node.nextSibling;
     } else if (isElementNode(node)) {
       if (node.hasAttribute(ATTR_MARK)) {
@@ -81,6 +86,7 @@ export function getTemplate(res: ITemplateResult): ITemplate {
   return template;
 }
 
-function createEmptyTextNode() {
+function createMarkNode() {
+  if (isIE) return document.createComment('');
   return document.createTextNode('');
 }
