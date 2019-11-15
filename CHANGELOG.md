@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.6](https://github.com/art-bazhin/modeste/compare/v0.1.5...v0.1.6) (2019-11-15)
+
+
+### Feature Improvements
+
+* remove html comments from generated markup ([86b53e5](https://github.com/art-bazhin/modeste/commit/86b53e5323e01a310dd5093190505c3a4b47dee4))
+
+
+### Docs
+
+* **package.json:** add license field ([a29bf30](https://github.com/art-bazhin/modeste/commit/a29bf30f8a31cda5fe805a29549423c655d3f26e))
+
 ### [0.1.5](https://github.com/art-bazhin/modeste/compare/v0.1.4...v0.1.5) (2019-11-14)
 
 
