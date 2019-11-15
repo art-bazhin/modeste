@@ -33,8 +33,8 @@ export function getTemplate(res: ITemplateResult): ITemplate {
     fragment.removeChild(svgRoot);
   }
 
-  fragment.appendChild(document.createComment(MARK));
-  fragment.insertBefore(document.createComment(MARK), fragment.firstChild);
+  fragment.appendChild(createEmptyTextNode());
+  fragment.insertBefore(createEmptyTextNode(), fragment.firstChild);
 
   let node = fragment.firstChild as Node | null;
   let position = [0];
@@ -45,6 +45,7 @@ export function getTemplate(res: ITemplateResult): ITemplate {
 
     if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
       parts.push({ type: NODE_PART_ID, position: position.slice() });
+      node.parentNode!.replaceChild(createEmptyTextNode(), node);
       node = node.nextSibling;
     } else if (isElementNode(node)) {
       if (node.hasAttribute(ATTR_MARK)) {
@@ -78,4 +79,8 @@ export function getTemplate(res: ITemplateResult): ITemplate {
   templatesMap.set(strings, template);
 
   return template;
+}
+
+function createEmptyTextNode() {
+  return document.createTextNode('');
 }

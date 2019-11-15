@@ -106,11 +106,13 @@ export function insertBefore(value: any, refChild: Node): Node {
 
 export function hasSameType(value: any, node: Node) {
   const isRes = isTemplateResult(value);
+  const isMark = isOpenMark(node);
 
-  if (node.nodeType === Node.TEXT_NODE && !isRes) return TEXT_NODE_ID;
+  if (node.nodeType === Node.TEXT_NODE && !isRes && !isMark)
+    return TEXT_NODE_ID;
   else if (
     isRes &&
-    isOpenMark(node) &&
+    isMark &&
     (node as any)[TEMPLATE_INSTANCE_KEY].template === getTemplate(value)
   )
     return TEMPLATE_NODE_ID;
