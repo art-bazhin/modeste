@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.8](https://github.com/art-bazhin/modeste/compare/v0.1.7...v0.1.8) (2019-11-16)
+
+
+### Bug Fixes
+
+* fix node iteration bug ([0803e7c](https://github.com/art-bazhin/modeste/commit/0803e7cf7a7381d34d61fa9e21721ded65d43402))
+
 ### [0.1.7](https://github.com/art-bazhin/modeste/compare/v0.1.6...v0.1.7) (2019-11-15)
 
 
