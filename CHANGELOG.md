@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.9](https://github.com/art-bazhin/modeste/compare/v0.1.8...v0.1.9) (2019-11-16)
+
+
+### Performance Improvements
+
+* improve node removal performance ([8d676ab](https://github.com/art-bazhin/modeste/commit/8d676ab64d176b93bd8a90f512bb0fcaf5ebb36e))
+
 ### [0.1.8](https://github.com/art-bazhin/modeste/compare/v0.1.7...v0.1.8) (2019-11-16)
 
 
