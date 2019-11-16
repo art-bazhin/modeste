@@ -49,9 +49,11 @@ export function getTemplate(res: ITemplateResult): ITemplate {
     let parent = node.parentNode;
 
     if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
+      const mark = createMarkNode();
+
       parts.push({ type: NODE_PART_ID, position: position.slice() });
-      node.parentNode!.replaceChild(createMarkNode(), node);
-      node = node.nextSibling;
+      node.parentNode!.replaceChild(mark, node);
+      node = mark.nextSibling;
     } else if (isElementNode(node)) {
       if (node.hasAttribute(ATTR_MARK)) {
         parts = parts.concat(getTemplatePartsFromElement(node, position));
