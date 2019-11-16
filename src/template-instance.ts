@@ -16,9 +16,9 @@ import { getTemplate, ITemplate } from './template';
 import {
   getNextSibling,
   insertBefore,
-  removeNode,
   updateNode,
-  getNodeFromPosition
+  getNodeFromPosition,
+  removeNodes
 } from './dom';
 
 export interface ITemplateInstance {
@@ -128,14 +128,8 @@ export function updateTemplateInstance(
           for (let i = min; i < max; i++) {
             insertBefore(valueArray[i], node);
           }
-        } else {
-          let next: Node;
-
-          for (let i = 0; i < dif; i++) {
-            next = getNextSibling(current)!;
-            removeNode(current);
-            current = next;
-          }
+        } else if (dif) {
+          removeNodes(current, node.previousSibling!);
         }
     }
   }

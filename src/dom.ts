@@ -39,7 +39,11 @@ export function updateNode(value: any, node: Node) {
 
   if (!type) {
     const newNode = insertBefore(value, node);
-    removeNode(node);
+    const end = isOpenMark(node)
+      ? getTemplateInstanceFromNode(node).closeMark
+      : node;
+
+    removeNodes(node, end);
     return newNode;
   } else if (type === TEXT_NODE_ID) {
     (node as Text).textContent = value + '';
@@ -52,20 +56,14 @@ export function updateNode(value: any, node: Node) {
   }
 }
 
-export function removeNode(node: Node) {
-  const parent = node.parentNode!;
+export function removeNodes(start: Node, end: Node) {
+  const parent = start.parentNode!;
+  let node = start;
 
-  if (isOpenMark(node)) {
-    let instance = getTemplateInstanceFromNode(node);
-
-    while (
-      !isCloseMark(node) ||
-      instance !== getTemplateInstanceFromNode(node)
-    ) {
-      let next = node.nextSibling!;
-      parent.removeChild(node);
-      node = next;
-    }
+  while (node !== end) {
+    const next = node.nextSibling!;
+    parent.removeChild(node);
+    node = next;
   }
 
   parent.removeChild(node);
@@ -77,7 +75,7 @@ export function getNextSibling(node: Node) {
   return node.nextSibling;
 }
 
-export function getTemplateInstanceFromNode(node: Node) {
+export function getTemplateInstanceFromNode(node: Node): ITemplateInstance {
   return (node as any)[TEMPLATE_INSTANCE_KEY];
 }
 
