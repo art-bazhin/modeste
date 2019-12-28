@@ -9,7 +9,8 @@ import {
   TEMPLATE_NODE_ID,
   CLOSE_MARK_ID,
   TEXT_NODE_ID,
-  OPEN_MARK_ID
+  OPEN_MARK_ID,
+  ELEMENT_NODE_ID
 } from './constants';
 import { isTemplateResult } from './template-result';
 import { getTemplate } from './template';
@@ -47,6 +48,8 @@ export function updateNode(value: any, node: Node) {
     return newNode;
   } else if (type === TEXT_NODE_ID) {
     (node as Text).textContent = value + '';
+    return node;
+  } else if (type === ELEMENT_NODE_ID) {
     return node;
   } else {
     return updateTemplateInstance(
@@ -99,14 +102,21 @@ export function insertBefore(value: any, refChild: Node): Node {
     return instance.openMark;
   }
 
+  if (isElementNode(value)) {
+    parent.insertBefore(value as HTMLElement, refChild);
+    return value;
+  }
+
   return parent.insertBefore(document.createTextNode(value), refChild);
 }
 
 export function hasSameType(value: any, node: Node) {
   const isRes = isTemplateResult(value);
   const isMark = isOpenMark(node);
+  const isEl = isElementNode(value);
 
-  if (node.nodeType === Node.TEXT_NODE && !isRes && !isMark)
+  if (isEl && value === node) return ELEMENT_NODE_ID;
+  else if (node.nodeType === Node.TEXT_NODE && !isRes && !isMark && !isEl)
     return TEXT_NODE_ID;
   else if (
     isRes &&

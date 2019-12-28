@@ -8,7 +8,7 @@ testNode.appendChild(document.createTextNode(''));
 
 const isIE = !testNode.cloneNode(true).firstChild;
 
-const templatesMap = new WeakMap<TemplateStringsArray, ITemplate>();
+const templatesMap = new Map<TemplateStringsArray, ITemplate>();
 
 export interface ITemplate {
   fragment: DocumentFragment;

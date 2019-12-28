@@ -18,6 +18,7 @@ export const CLOSE_MARK_ID = 2;
 
 export const TEXT_NODE_ID = 1;
 export const TEMPLATE_NODE_ID = 2;
+export const ELEMENT_NODE_ID = 3;
 
 export const NODE_PART_ID = 1;
 export const ATTR_PART_ID = 2;
