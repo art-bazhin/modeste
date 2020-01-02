@@ -1,9 +1,4 @@
 import {
-  TEMPLATE_INSTANCE_KEY,
-  MARK_TYPE_KEY,
-  OPEN_MARK_ID,
-  CLOSE_MARK_ID,
-  NODE_REF_KEY,
   ATTR_PART_ID,
   EVENT_PART_ID,
   REF_PART_ID,
@@ -18,7 +13,12 @@ import {
   insertBefore,
   updateNode,
   getNodeFromPosition,
-  removeNodes
+  removeNodes,
+  setTemplateInstance,
+  setOpenMark,
+  setCloseMark,
+  setFirstNodeRef,
+  getFirstNodeRef
 } from './dom';
 
 export interface ITemplateInstance {
@@ -27,8 +27,8 @@ export interface ITemplateInstance {
   parts: ITemplatePart[];
   values: any[];
   nodes: Node[];
-  openMark: any;
-  closeMark: any;
+  openMark: Node;
+  closeMark: Node;
 }
 
 export function createTemplateInstance(
@@ -72,16 +72,16 @@ export function createTemplateInstance(
 
         for (let i = 0; i < arr.length; i++) {
           const n = insertBefore(arr[i], node);
-          if (!i) (node as any)[NODE_REF_KEY] = n;
+          if (!i) setFirstNodeRef(node, n);
         }
     }
   }
 
-  openMark[TEMPLATE_INSTANCE_KEY] = instance;
-  closeMark[TEMPLATE_INSTANCE_KEY] = instance;
+  setTemplateInstance(openMark, instance);
+  setTemplateInstance(closeMark, instance);
 
-  openMark[MARK_TYPE_KEY] = OPEN_MARK_ID;
-  closeMark[MARK_TYPE_KEY] = CLOSE_MARK_ID;
+  setOpenMark(openMark);
+  setCloseMark(closeMark);
 
   return instance;
 }
@@ -116,11 +116,11 @@ export function updateTemplateInstance(
         const max = Math.max(valueArray.length, oldValueArray.length);
         const dif = max - min;
 
-        let current = (node as any)[NODE_REF_KEY] as Node;
+        let current = getFirstNodeRef(node);
 
         for (let i = 0; i < min; i++) {
           const n = updateNode(valueArray[i], current);
-          if (!i) (node as any)[NODE_REF_KEY] = n;
+          if (!i) setFirstNodeRef(node, n);
           current = getNextSibling(n)!;
         }
 
