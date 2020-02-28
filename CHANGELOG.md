@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.11](https://github.com/art-bazhin/modeste/compare/v0.1.10...v0.1.11) (2020-02-28)
+
+
+### Code Refactoring
+
+* refactor access to custom DOM node fields ([4dac297](https://github.com/art-bazhin/modeste/commit/4dac297c431d80f60622004337b33c6ed43dc63b))
+
 ### [0.1.10](https://github.com/art-bazhin/modeste/compare/v0.1.9...v0.1.10) (2019-12-28)
 
 
