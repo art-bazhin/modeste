@@ -149,7 +149,9 @@ function processAttr(attr: string, value: any, node: Element) {
     case true:
       return node.setAttribute(attr, '');
     case false:
-      return node.setAttribute(attr, '');
+    case null:
+    case undefined:
+      return node.removeAttribute(attr);
     default:
       if (attr === 'value') (node as any).value = value;
       node.setAttribute(attr, value as string);
