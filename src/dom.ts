@@ -20,6 +20,11 @@ function getMarkType(node: Node): number {
   return (node as any)[MARK_TYPE_KEY];
 }
 
+function prepareNodeValue(value: any) {
+  if (value === undefined || value === false || value === null) return '';
+  return value;
+}
+
 export function isElementNode(node: any): node is HTMLElement {
   return node.nodeType === Node.ELEMENT_NODE;
 }
@@ -49,6 +54,7 @@ export function setCloseMark(node: Node) {
 }
 
 export function updateNode(value: any, node: Node) {
+  value = prepareNodeValue(value);
   const type = hasSameType(value, node);
 
   if (!type) {
@@ -106,6 +112,7 @@ export function getNodeFromPosition(
 }
 
 export function insertBefore(value: any, refChild: Node): Node {
+  value = prepareNodeValue(value);
   const parent = refChild.parentNode!;
 
   if (isTemplateResult(value)) {
