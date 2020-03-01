@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.12](https://github.com/art-bazhin/modeste/compare/v0.1.11...v0.1.12) (2020-03-01)
+
+
+### Bug Fixes
+
+* bind event handlers to DOM nodes ([d0c900d](https://github.com/art-bazhin/modeste/commit/d0c900d01b93fce6e7ffac58046299b8deed6fec))
+* fix boolean attributes removal ([0275fd2](https://github.com/art-bazhin/modeste/commit/0275fd2060824bd6190705e5774772ad1f179eeb))
+* render falsy values as empty text nodes ([5ef5b9f](https://github.com/art-bazhin/modeste/commit/5ef5b9f1bb8be28007ece3fb163743b5dbd412c4))
+
+
+### Build System
+
+* fix vulnerabilities ([badd4f6](https://github.com/art-bazhin/modeste/commit/badd4f6aa6ea29cb7971041d85edd888fab7cb33))
+* update dev dependencies ([a7e0f07](https://github.com/art-bazhin/modeste/commit/a7e0f073b053f312ccfff2f1b091ac15a7f6de2f))
+* update typescript version ([0a12b10](https://github.com/art-bazhin/modeste/commit/0a12b10224309544c2c94996fc4167ec20c70e89))
+
 ### [0.1.11](https://github.com/art-bazhin/modeste/compare/v0.1.10...v0.1.11) (2020-02-28)
 
 
