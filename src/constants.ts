@@ -23,4 +23,4 @@ export const ATTR_PART_ID = 2;
 export const EVENT_PART_ID = 3;
 export const REF_PART_ID = 4;
 
-export const REF_ATTR_NAME = 'mdst-ref';
+export const REF_ATTR_NAME = 'ref';
