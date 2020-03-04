@@ -1,4 +1,4 @@
-import { PLACEHOLDER_MARK, ATTR_MARK, NODE_PART_ID } from './constants';
+import { PLACEHOLDER_MARK, ATTR_MARK, NODE_PART } from './constants';
 import { TemplateResult, getTemplateResultHTML } from './template-result';
 import { TemplatePart, getTemplatePartsFromElement } from './template-part';
 import { isCommentNode, isElementNode } from './dom';
@@ -48,7 +48,7 @@ export function getTemplate(res: TemplateResult): Template {
     if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
       const mark = createMarkNode();
 
-      parts.push({ type: NODE_PART_ID, position: position.slice() });
+      parts.push({ type: NODE_PART, position: position.slice() });
       node.parentNode!.replaceChild(mark, node);
       node = mark.nextSibling;
     } else if (isElementNode(node)) {

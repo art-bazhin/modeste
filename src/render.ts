@@ -1,19 +1,22 @@
 import {
   createTemplateInstance,
-  updateTemplateInstance
+  updateTemplateInstance,
+  TemplateInstance
 } from './template-instance';
 import { TemplateResult } from './template-result';
 import { getTemplate } from './template';
-import { getTemplateInstance } from './dom';
+
+const instances = new Map<HTMLElement, TemplateInstance>();
 
 export function render(res: TemplateResult, container: HTMLElement) {
   const template = getTemplate(res);
-  const instance =
-    container.firstChild && getTemplateInstance(container.firstChild);
+  const instance = instances.get(container);
 
   if (!instance || template !== instance.template) {
     container.innerHTML = '';
-    container.appendChild(createTemplateInstance(res).fragment);
+    const instance = createTemplateInstance(res);
+    instances.set(container, instance);
+    container.appendChild(instance.fragment);
   } else {
     updateTemplateInstance(instance, res.values);
   }

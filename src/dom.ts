@@ -1,16 +1,15 @@
 import {
   TemplateInstance,
+  TemplateInstanceChild,
   updateTemplateInstance,
-  createTemplateInstance
+  createTemplateInstance,
+  isTemplateInstance
 } from './template-instance';
 import {
-  TEMPLATE_INSTANCE_KEY,
-  TEMPLATE_NODE_ID,
-  TEXT_NODE_ID,
-  ELEMENT_NODE_ID,
-  FIRST_NODE_KEY,
-  LAST_NODE_KEY,
-  NODE_REF_KEY
+  TEMPLATE_INSTANCE_NODE,
+  TEXT_NODE,
+  ELEMENT_NODE,
+  COMMENT_NODE
 } from './constants';
 import { isTemplateResult } from './template-result';
 import { getTemplate } from './template';
@@ -21,53 +20,32 @@ function prepareNodeValue(value: any) {
 }
 
 export function isElementNode(node: any): node is HTMLElement {
-  return node.nodeType === Node.ELEMENT_NODE;
+  return node.nodeType === ELEMENT_NODE;
 }
 
 export function isCommentNode(node: any): node is Comment {
-  return node.nodeType === Node.COMMENT_NODE;
+  return node.nodeType === COMMENT_NODE;
 }
 
 export function isTextNode(node: any): node is Text {
-  return node.nodeType === Node.TEXT_NODE;
+  return node.nodeType === TEXT_NODE;
 }
 
-export function isOpenMark(node: Node): boolean {
-  return (node as any)[FIRST_NODE_KEY];
-}
-
-export function markNodeAsFirst(node: Node, instance: TemplateInstance) {
-  (node as any)[FIRST_NODE_KEY] = true;
-  setTemplateInstance(node, instance);
-}
-
-export function isCloseMark(node: Node): boolean {
-  return (node as any)[LAST_NODE_KEY];
-}
-
-export function markNodeAsLast(node: Node, instance: TemplateInstance) {
-  (node as any)[LAST_NODE_KEY] = true;
-  setTemplateInstance(node, instance);
-}
-
-export function updateNode(value: any, node: Node) {
+export function updateChild(value: any, child: TemplateInstanceChild) {
   value = prepareNodeValue(value);
-  const type = hasSameType(value, node);
 
-  if (!type) {
-    const newNode = insertBefore(value, node);
-    const end = isOpenMark(node) ? getTemplateInstance(node).lastNode : node;
-
-    removeNodes(node, end);
-    return newNode;
-  } else if (type === TEXT_NODE_ID) {
-    (node as Text).textContent = value;
-    return node;
-  } else if (type === ELEMENT_NODE_ID) {
-    return node;
-  } else {
-    return updateTemplateInstance(getTemplateInstance(node), value.values)
-      .firstNode as Node;
+  switch (hasSameType(value, child)) {
+    case TEXT_NODE:
+      (child as Text).textContent = value;
+      return child;
+    case ELEMENT_NODE:
+      return child;
+    case TEMPLATE_INSTANCE_NODE:
+      return updateTemplateInstance(child as TemplateInstance, value.values);
+    default:
+      const newNode = insertBefore(value, child);
+      removeChild(child);
+      return newNode;
   }
 }
 
@@ -84,17 +62,9 @@ export function removeNodes(start: Node, end: Node) {
   parent.removeChild(node);
 }
 
-export function getNextSibling(node: Node) {
-  if (isOpenMark(node)) return getTemplateInstance(node).lastNode.nextSibling;
-  return node.nextSibling;
-}
-
-export function getTemplateInstance(node: Node): TemplateInstance {
-  return (node as any)[TEMPLATE_INSTANCE_KEY];
-}
-
-function setTemplateInstance(node: Node, instance: TemplateInstance) {
-  return ((node as any)[TEMPLATE_INSTANCE_KEY] = instance);
+export function removeChild(child: TemplateInstanceChild) {
+  if (isTemplateInstance(child)) removeNodes(child.firstNode, child.lastNode);
+  else removeNodes(child, child);
 }
 
 export function getNodeFromPosition(
@@ -108,46 +78,39 @@ export function getNodeFromPosition(
   return getNodeFromPosition(position, child, level + 1);
 }
 
-export function insertBefore(value: any, refChild: Node): Node {
+export function insertBefore(value: any, refChild: Node | TemplateInstance) {
   value = prepareNodeValue(value);
-  const parent = refChild.parentNode!;
+  const refNode = isTemplateInstance(refChild) ? refChild.firstNode : refChild;
+  const parent = refNode.parentNode!;
 
   if (isTemplateResult(value)) {
     const instance = createTemplateInstance(value);
-    parent.insertBefore(instance.fragment, refChild);
-    return instance.firstNode;
+    parent.insertBefore(instance.fragment, refNode);
+    return instance;
   }
 
   if (isElementNode(value)) {
-    parent.insertBefore(value as HTMLElement, refChild);
+    parent.insertBefore(value as HTMLElement, refNode);
     return value;
   }
 
-  return parent.insertBefore(document.createTextNode(value), refChild);
+  return parent.insertBefore(document.createTextNode(value), refNode);
 }
 
-export function hasSameType(value: any, node: Node) {
-  const isRes = isTemplateResult(value);
-  const isMark = isOpenMark(node);
-  const isEl = isElementNode(value);
+export function hasSameType(value: any, child: TemplateInstanceChild) {
+  const isResult = isTemplateResult(value);
+  const isElement = isElementNode(value);
+  const isInstance = isTemplateInstance(child);
 
-  if (isEl && value === node) return ELEMENT_NODE_ID;
-  else if (node.nodeType === Node.TEXT_NODE && !isRes && !isMark && !isEl)
-    return TEXT_NODE_ID;
+  if (isElement && value === child) return ELEMENT_NODE;
+  else if (isTextNode(child) && !isResult && !isInstance && !isElement)
+    return TEXT_NODE;
   else if (
-    isRes &&
-    isMark &&
-    getTemplateInstance(node).template === getTemplate(value)
+    isResult &&
+    isInstance &&
+    (child as TemplateInstance).template === getTemplate(value)
   )
-    return TEMPLATE_NODE_ID;
+    return TEMPLATE_INSTANCE_NODE;
 
   return false;
-}
-
-export function setFirstNodeRef(markNode: Node, refNode: Node) {
-  (markNode as any)[NODE_REF_KEY] = refNode;
-}
-
-export function getFirstNodeRef(markNode: Node): Node {
-  return (markNode as any)[NODE_REF_KEY];
 }

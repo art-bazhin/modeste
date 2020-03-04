@@ -8,19 +8,14 @@ export const ATTR_MARK = MARK + '-attr';
 export const ATTR_NUM_SEPARATOR = '_';
 export const PLACEHOLDER_COMMENT = '<!--' + PLACEHOLDER_MARK + '-->';
 
-export const TEMPLATE_INSTANCE_KEY = '__mdstTemplateInstance';
-export const EVENTS_KEY = '__mdstEvents';
-export const FIRST_NODE_KEY = '__mdstFirst';
-export const LAST_NODE_KEY = '__mdstLast';
-export const NODE_REF_KEY = '__mdstNodeRef';
+export const TEXT_NODE = Node.TEXT_NODE;
+export const ELEMENT_NODE = Node.ELEMENT_NODE;
+export const COMMENT_NODE = Node.COMMENT_NODE;
+export const TEMPLATE_INSTANCE_NODE = 42;
 
-export const TEXT_NODE_ID = 1;
-export const TEMPLATE_NODE_ID = 2;
-export const ELEMENT_NODE_ID = 3;
-
-export const NODE_PART_ID = 1;
-export const ATTR_PART_ID = 2;
-export const EVENT_PART_ID = 3;
-export const REF_PART_ID = 4;
+export const NODE_PART = 1;
+export const ATTR_PART = 2;
+export const EVENT_PART = 3;
+export const REF_PART = 4;
 
 export const REF_ATTR_NAME = 'ref';

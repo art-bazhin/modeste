@@ -1,8 +1,8 @@
 import {
   ATTR_MARK,
-  ATTR_PART_ID,
-  EVENT_PART_ID,
-  REF_PART_ID,
+  ATTR_PART,
+  EVENT_PART,
+  REF_PART,
   ATTR_NUM_SEPARATOR,
   REF_ATTR_NAME
 } from './constants';
@@ -37,17 +37,17 @@ export function getTemplatePartsFromElement(
 
   for (let i = 0; i < attrs.length; i++) {
     let part: TemplatePart = {
-      type: ATTR_PART_ID,
+      type: ATTR_PART,
       position: position.slice()
     };
 
     const attrName = attrs[i].name;
 
     if (attrName[0] === 'o' && attrName[1] === 'n') {
-      part.type = EVENT_PART_ID;
+      part.type = EVENT_PART;
       part.name = attrName.substr(2);
     } else if (attrName === REF_ATTR_NAME) {
-      part.type = REF_PART_ID;
+      part.type = REF_PART;
     } else {
       part.name = attrName;
     }
