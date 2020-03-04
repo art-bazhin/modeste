@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/art-bazhin/modeste/compare/v0.1.12...v0.2.0) (2020-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* 'mdst-ref' => 'ref'
+
+### Feature Improvements
+
+* change ref attribute name ([2df68f0](https://github.com/art-bazhin/modeste/commit/2df68f094f81f268449b92a2cd09de2242588edc))
+* remove redundant mark nodes ([da79706](https://github.com/art-bazhin/modeste/commit/da79706abd297cc0cce426d550163ba229302d41))
+
 ### [0.1.12](https://github.com/art-bazhin/modeste/compare/v0.1.11...v0.1.12) (2020-03-01)
 
 
