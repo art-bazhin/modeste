@@ -61,7 +61,7 @@ export function updateNode(value: any, node: Node) {
     removeNodes(node, end);
     return newNode;
   } else if (type === TEXT_NODE_ID) {
-    (node as Text).textContent = value + '';
+    (node as Text).textContent = value;
     return node;
   } else if (type === ELEMENT_NODE_ID) {
     return node;
