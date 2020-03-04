@@ -1,24 +1,19 @@
 import {
-  ITemplateInstance,
+  TemplateInstance,
   updateTemplateInstance,
   createTemplateInstance
 } from './template-instance';
 import {
   TEMPLATE_INSTANCE_KEY,
-  MARK_TYPE_KEY,
   TEMPLATE_NODE_ID,
-  CLOSE_MARK_ID,
   TEXT_NODE_ID,
-  OPEN_MARK_ID,
   ELEMENT_NODE_ID,
+  FIRST_NODE_KEY,
+  LAST_NODE_KEY,
   NODE_REF_KEY
 } from './constants';
 import { isTemplateResult } from './template-result';
 import { getTemplate } from './template';
-
-function getMarkType(node: Node): number {
-  return (node as any)[MARK_TYPE_KEY];
-}
 
 function prepareNodeValue(value: any) {
   if (value === undefined || value === false || value === null) return '';
@@ -37,20 +32,22 @@ export function isTextNode(node: any): node is Text {
   return node.nodeType === Node.TEXT_NODE;
 }
 
-export function isOpenMark(node: Node) {
-  return getMarkType(node) === OPEN_MARK_ID;
+export function isOpenMark(node: Node): boolean {
+  return (node as any)[FIRST_NODE_KEY];
 }
 
-export function setOpenMark(node: Node) {
-  (node as any)[MARK_TYPE_KEY] = OPEN_MARK_ID;
+export function markNodeAsFirst(node: Node, instance: TemplateInstance) {
+  (node as any)[FIRST_NODE_KEY] = true;
+  setTemplateInstance(node, instance);
 }
 
-export function isCloseMark(node: Node) {
-  return getMarkType(node) === CLOSE_MARK_ID;
+export function isCloseMark(node: Node): boolean {
+  return (node as any)[LAST_NODE_KEY];
 }
 
-export function setCloseMark(node: Node) {
-  (node as any)[MARK_TYPE_KEY] = CLOSE_MARK_ID;
+export function markNodeAsLast(node: Node, instance: TemplateInstance) {
+  (node as any)[LAST_NODE_KEY] = true;
+  setTemplateInstance(node, instance);
 }
 
 export function updateNode(value: any, node: Node) {
@@ -59,7 +56,7 @@ export function updateNode(value: any, node: Node) {
 
   if (!type) {
     const newNode = insertBefore(value, node);
-    const end = isOpenMark(node) ? getTemplateInstance(node).closeMark : node;
+    const end = isOpenMark(node) ? getTemplateInstance(node).lastNode : node;
 
     removeNodes(node, end);
     return newNode;
@@ -70,7 +67,7 @@ export function updateNode(value: any, node: Node) {
     return node;
   } else {
     return updateTemplateInstance(getTemplateInstance(node), value.values)
-      .openMark as Node;
+      .firstNode as Node;
   }
 }
 
@@ -88,15 +85,15 @@ export function removeNodes(start: Node, end: Node) {
 }
 
 export function getNextSibling(node: Node) {
-  if (isOpenMark(node)) return getTemplateInstance(node).closeMark.nextSibling;
+  if (isOpenMark(node)) return getTemplateInstance(node).lastNode.nextSibling;
   return node.nextSibling;
 }
 
-export function getTemplateInstance(node: Node): ITemplateInstance {
+export function getTemplateInstance(node: Node): TemplateInstance {
   return (node as any)[TEMPLATE_INSTANCE_KEY];
 }
 
-export function setTemplateInstance(node: Node, instance: ITemplateInstance) {
+function setTemplateInstance(node: Node, instance: TemplateInstance) {
   return ((node as any)[TEMPLATE_INSTANCE_KEY] = instance);
 }
 
@@ -118,7 +115,7 @@ export function insertBefore(value: any, refChild: Node): Node {
   if (isTemplateResult(value)) {
     const instance = createTemplateInstance(value);
     parent.insertBefore(instance.fragment, refChild);
-    return instance.openMark;
+    return instance.firstNode;
   }
 
   if (isElementNode(value)) {

@@ -1,14 +1,12 @@
 import {
-  ITemplateInstance,
   createTemplateInstance,
   updateTemplateInstance
 } from './template-instance';
-import { TEMPLATE_INSTANCE_KEY } from './constants';
-import { ITemplateResult } from './template-result';
+import { TemplateResult } from './template-result';
 import { getTemplate } from './template';
 import { getTemplateInstance } from './dom';
 
-export function render(res: ITemplateResult, container: HTMLElement) {
+export function render(res: TemplateResult, container: HTMLElement) {
   const template = getTemplate(res);
   const instance =
     container.firstChild && getTemplateInstance(container.firstChild);

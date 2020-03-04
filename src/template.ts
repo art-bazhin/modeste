@@ -1,6 +1,6 @@
-import { PLACEHOLDER_MARK, ATTR_MARK, MARK, NODE_PART_ID } from './constants';
-import { ITemplateResult, getTemplateResultHTML } from './template-result';
-import { ITemplatePart, getTemplatePartsFromElement } from './template-part';
+import { PLACEHOLDER_MARK, ATTR_MARK, NODE_PART_ID } from './constants';
+import { TemplateResult, getTemplateResultHTML } from './template-result';
+import { TemplatePart, getTemplatePartsFromElement } from './template-part';
 import { isCommentNode, isElementNode } from './dom';
 
 const testNode = document.createElement('div');
@@ -8,17 +8,17 @@ testNode.appendChild(document.createTextNode(''));
 
 const isIE = !testNode.cloneNode(true).firstChild;
 
-const templatesMap = new Map<TemplateStringsArray, ITemplate>();
+const templatesMap = new Map<TemplateStringsArray, Template>();
 
-export interface ITemplate {
+export interface Template {
   fragment: DocumentFragment;
-  parts: ITemplatePart[];
+  parts: TemplatePart[];
 }
 
-export function getTemplate(res: ITemplateResult): ITemplate {
+export function getTemplate(res: TemplateResult): Template {
   const { strings } = res;
 
-  if (templatesMap.has(strings)) return templatesMap.get(strings) as ITemplate;
+  if (templatesMap.has(strings)) return templatesMap.get(strings) as Template;
 
   const templateElement = document.createElement('template');
   let html = getTemplateResultHTML(res);
@@ -38,12 +38,9 @@ export function getTemplate(res: ITemplateResult): ITemplate {
     fragment.removeChild(svgRoot);
   }
 
-  fragment.appendChild(createMarkNode());
-  fragment.insertBefore(createMarkNode(), fragment.firstChild);
-
   let node = fragment.firstChild as Node | null;
   let position = [0];
-  let parts: ITemplatePart[] = [];
+  let parts: TemplatePart[] = [];
 
   while (node) {
     let parent = node.parentNode;

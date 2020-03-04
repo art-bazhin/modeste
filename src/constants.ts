@@ -10,11 +10,9 @@ export const PLACEHOLDER_COMMENT = '<!--' + PLACEHOLDER_MARK + '-->';
 
 export const TEMPLATE_INSTANCE_KEY = '__mdstTemplateInstance';
 export const EVENTS_KEY = '__mdstEvents';
-export const MARK_TYPE_KEY = '__mdstMarkType';
+export const FIRST_NODE_KEY = '__mdstFirst';
+export const LAST_NODE_KEY = '__mdstLast';
 export const NODE_REF_KEY = '__mdstNodeRef';
-
-export const OPEN_MARK_ID = 1;
-export const CLOSE_MARK_ID = 2;
 
 export const TEXT_NODE_ID = 1;
 export const TEMPLATE_NODE_ID = 2;

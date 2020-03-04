@@ -5,42 +5,41 @@ import {
   NODE_PART_ID,
   REF_ATTR_NAME
 } from './constants';
-import { ITemplateResult } from './template-result';
-import { ITemplatePart } from './template-part';
-import { getTemplate, ITemplate } from './template';
+import { TemplateResult } from './template-result';
+import { TemplatePart } from './template-part';
+import { getTemplate, Template } from './template';
 import {
   getNextSibling,
   insertBefore,
   updateNode,
   getNodeFromPosition,
   removeNodes,
-  setTemplateInstance,
-  setOpenMark,
-  setCloseMark,
+  markNodeAsFirst,
+  markNodeAsLast,
   setFirstNodeRef,
   getFirstNodeRef
 } from './dom';
 
-export interface ITemplateInstance {
-  template: ITemplate;
+export interface TemplateInstance {
+  template: Template;
   fragment: DocumentFragment;
-  parts: ITemplatePart[];
+  parts: TemplatePart[];
   values: any[];
   nodes: Node[];
-  openMark: Node;
-  closeMark: Node;
+  firstNode: Node;
+  lastNode: Node;
 }
 
 export function createTemplateInstance(
-  res: ITemplateResult
-): ITemplateInstance {
+  res: TemplateResult
+): TemplateInstance {
   const template = getTemplate(res);
   const parts = template.parts;
   const values = res.values;
   const fragment = template.fragment.cloneNode(true) as DocumentFragment;
   const nodes = parts.map(part => getNodeFromPosition(part.position, fragment));
-  const openMark = fragment.firstChild as any;
-  const closeMark = fragment.lastChild as any;
+  const firstNode = fragment.firstChild as any;
+  const lastNode = fragment.lastChild as any;
 
   const instance = {
     template,
@@ -48,8 +47,8 @@ export function createTemplateInstance(
     nodes,
     values,
     parts,
-    openMark,
-    closeMark
+    firstNode,
+    lastNode
   };
 
   for (let i = 0; i < parts.length; i++) {
@@ -77,19 +76,16 @@ export function createTemplateInstance(
     }
   }
 
-  setTemplateInstance(openMark, instance);
-  setTemplateInstance(closeMark, instance);
-
-  setOpenMark(openMark);
-  setCloseMark(closeMark);
+  markNodeAsFirst(firstNode, instance);
+  markNodeAsLast(lastNode, instance);
 
   return instance;
 }
 
 export function updateTemplateInstance(
-  instance: ITemplateInstance,
+  instance: TemplateInstance,
   values: any[]
-): ITemplateInstance {
+): TemplateInstance {
   const parts = instance.template.parts;
 
   for (let i = 0; i < parts.length; i++) {
@@ -161,7 +157,7 @@ function processAttr(attr: string, value: any, node: Element) {
 function processEvent(
   event: string,
   node: Node,
-  instance: ITemplateInstance,
+  instance: TemplateInstance,
   index: number
 ) {
   node.addEventListener(event, (e: any) => {

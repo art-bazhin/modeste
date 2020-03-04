@@ -22,7 +22,7 @@ function getAttributes(node: Element) {
   return result.filter(el => el);
 }
 
-export interface ITemplatePart {
+export interface TemplatePart {
   name?: string;
   type: number;
   position: number[];
@@ -31,12 +31,12 @@ export interface ITemplatePart {
 export function getTemplatePartsFromElement(
   node: HTMLElement,
   position: number[]
-): ITemplatePart[] {
-  const parts: ITemplatePart[] = [];
+): TemplatePart[] {
+  const parts: TemplatePart[] = [];
   const attrs = getAttributes(node);
 
   for (let i = 0; i < attrs.length; i++) {
-    let part: ITemplatePart = {
+    let part: TemplatePart = {
       type: ATTR_PART_ID,
       position: position.slice()
     };

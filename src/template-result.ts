@@ -31,31 +31,31 @@ function replaceTag(tag: string) {
   return tagProcessed;
 }
 
-export interface ITemplateResult {
+export interface TemplateResult {
   strings: TemplateStringsArray;
   values: any[];
   isSVG?: boolean;
 }
 
-export function getTemplateResultHTML(res: ITemplateResult) {
+export function getTemplateResultHTML(res: TemplateResult) {
   let html = res.strings.join(PLACEHOLDER_MARK).replace(tagRegEx, replaceTag);
   return html.replace(markRegEx, PLACEHOLDER_COMMENT);
 }
 
-export function isTemplateResult(res: any): res is ITemplateResult {
+export function isTemplateResult(res: any): res is TemplateResult {
   return !!(res && res.values && res.strings);
 }
 
 export function createTemplateResult(
   strings: TemplateStringsArray,
   ...values: any[]
-): ITemplateResult {
+): TemplateResult {
   return { strings, values };
 }
 
 export function createSVGTemplateResult(
   strings: TemplateStringsArray,
   ...values: any[]
-): ITemplateResult {
+): TemplateResult {
   return { strings, values, isSVG: true };
 }
