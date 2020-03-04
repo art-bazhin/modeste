@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/art-bazhin/modeste/compare/v0.2.0...v0.2.1) (2020-03-04)
+
+
+### Performance Improvements
+
+* remove redundant type assertion ([411a095](https://github.com/art-bazhin/modeste/commit/411a095f4d8131ad406def14fc302740479e1c9e))
+
 ## [0.2.0](https://github.com/art-bazhin/modeste/compare/v0.1.12...v0.2.0) (2020-03-04)
 
 
