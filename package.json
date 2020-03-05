@@ -4,7 +4,7 @@
   "homepage": "https://github.com/art-bazhin/modeste",
   "repository": "git@github.com/art-bazhin/modeste.git",
   "bugs": "https://github.com/art-bazhin/modeste/issues",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "dist/modeste.js",
   "types": "dist/modeste.d.ts",
   "license": "MIT",
