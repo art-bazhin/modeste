@@ -43,7 +43,7 @@ export function getTemplateResultHTML(res: TemplateResult) {
 }
 
 export function isTemplateResult(res: any): res is TemplateResult {
-  return !!(res && res.values && res.strings);
+  return res.strings;
 }
 
 export function createTemplateResult(

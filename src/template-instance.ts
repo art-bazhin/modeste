@@ -4,7 +4,7 @@ import {
   REF_PART,
   NODE_PART,
   REF_ATTR_NAME,
-  TEMPLATE_INSTANCE_NODE
+  TEMPLATE_INSTANCE
 } from './constants';
 import { TemplateResult } from './template-result';
 import { TemplatePart } from './template-part';
@@ -23,7 +23,7 @@ interface TemplateInstanceChildren {
 }
 
 export function isTemplateInstance(value: any): value is TemplateInstance {
-  return value.nodeType === TEMPLATE_INSTANCE_NODE;
+  return value.nodeType === TEMPLATE_INSTANCE;
 }
 
 export interface TemplateInstance {
@@ -59,7 +59,7 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
     firstNode,
     lastNode,
     children,
-    nodeType: TEMPLATE_INSTANCE_NODE
+    nodeType: TEMPLATE_INSTANCE
   };
 
   for (let i = 0; i < parts.length; i++) {
@@ -123,10 +123,10 @@ export function updateTemplateInstance(
         const max = Math.max(valueArray.length, oldValueArray.length);
         const dif = max - min;
 
-        for (let i = 0; i < min; i++) {
-          if (valueArray[i] !== oldValueArray[i])
-            children.push(updateChild(valueArray[i], oldChildren[i]));
-        }
+        for (let i = 0; i < min; i++)
+          children.push(
+            updateChild(valueArray[i], oldValueArray[i], oldChildren[i])
+          );
 
         if (valueArray.length > oldValueArray.length) {
           for (let i = min; i < max; i++) {

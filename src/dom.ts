@@ -5,42 +5,36 @@ import {
   createTemplateInstance,
   isTemplateInstance
 } from './template-instance';
-import {
-  TEMPLATE_INSTANCE_NODE,
-  TEXT_NODE,
-  ELEMENT_NODE,
-  COMMENT_NODE
-} from './constants';
+import { TEMPLATE_INSTANCE, STRING } from './constants';
 import { isTemplateResult } from './template-result';
-import { getTemplate } from './template';
 
-function prepareNodeValue(value: any) {
-  if (value === undefined || value === false || value === null) return '';
-  return value;
+export function isDOMNode(value: any): value is HTMLElement | Text {
+  return value.nodeType;
 }
 
 export function isElementNode(node: any): node is HTMLElement {
-  return node.nodeType === ELEMENT_NODE;
+  return node.nodeType === Node.ELEMENT_NODE;
 }
 
 export function isCommentNode(node: any): node is Comment {
-  return node.nodeType === COMMENT_NODE;
+  return node.nodeType === Node.COMMENT_NODE;
 }
 
-export function isTextNode(node: any): node is Text {
-  return node.nodeType === TEXT_NODE;
-}
-
-export function updateChild(value: any, child: TemplateInstanceChild) {
+export function updateChild(
+  value: any,
+  oldValue: any,
+  child: TemplateInstanceChild
+) {
   value = prepareNodeValue(value);
+  oldValue = prepareNodeValue(oldValue);
 
-  switch (hasSameType(value, child)) {
-    case TEXT_NODE:
+  if (value === oldValue) return child;
+
+  switch (hasSameType(value, oldValue)) {
+    case STRING:
       (child as Text).textContent = value;
       return child;
-    case ELEMENT_NODE:
-      return child;
-    case TEMPLATE_INSTANCE_NODE:
+    case TEMPLATE_INSTANCE:
       return updateTemplateInstance(child as TemplateInstance, value.values);
     default:
       const newNode = insertBefore(value, child);
@@ -89,7 +83,7 @@ export function insertBefore(value: any, refChild: Node | TemplateInstance) {
     return instance;
   }
 
-  if (isElementNode(value)) {
+  if (isDOMNode(value)) {
     parent.insertBefore(value as HTMLElement, refNode);
     return value;
   }
@@ -97,20 +91,30 @@ export function insertBefore(value: any, refChild: Node | TemplateInstance) {
   return parent.insertBefore(document.createTextNode(value), refNode);
 }
 
-export function hasSameType(value: any, child: TemplateInstanceChild) {
-  const isResult = isTemplateResult(value);
-  const isElement = isElementNode(value);
-  const isInstance = isTemplateInstance(child);
+function prepareNodeValue(value: any) {
+  if ((!value && value === undefined) || value === null || value === false)
+    return '';
+  return value;
+}
 
-  if (isElement && value === child) return ELEMENT_NODE;
-  else if (isTextNode(child) && !isResult && !isInstance && !isElement)
-    return TEXT_NODE;
-  else if (
-    isResult &&
-    isInstance &&
-    (child as TemplateInstance).template === getTemplate(value)
+function hasSameType(value: any, oldValue: any) {
+  const valueIsTemplateResult = isTemplateResult(value);
+  const oldValueIsTemplateResult = isTemplateResult(oldValue);
+
+  if (
+    valueIsTemplateResult &&
+    oldValueIsTemplateResult &&
+    value.strings === oldValue.strings
   )
-    return TEMPLATE_INSTANCE_NODE;
+    return TEMPLATE_INSTANCE;
+
+  if (
+    !valueIsTemplateResult &&
+    !oldValueIsTemplateResult &&
+    !isDOMNode(value) &&
+    !isDOMNode(oldValue)
+  )
+    return STRING;
 
   return false;
 }
