@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.4](https://github.com/art-bazhin/modeste/compare/v0.2.3...v0.2.4) (2020-03-05)
+
+
+### Code Refactoring
+
+* remove redundant nodeType field ([7de92e6](https://github.com/art-bazhin/modeste/commit/7de92e63444bc8e19390182e9e27f4523d8f9626))
+
 ### [0.2.3](https://github.com/art-bazhin/modeste/compare/v0.2.2...v0.2.3) (2020-03-05)
 
 
