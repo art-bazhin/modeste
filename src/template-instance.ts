@@ -3,8 +3,7 @@ import {
   EVENT_PART,
   REF_PART,
   NODE_PART,
-  REF_ATTR_NAME,
-  TEMPLATE_INSTANCE
+  REF_ATTR_NAME
 } from './constants';
 import { TemplateResult } from './template-result';
 import { TemplatePart } from './template-part';
@@ -23,7 +22,7 @@ interface TemplateInstanceChildren {
 }
 
 export function isTemplateInstance(value: any): value is TemplateInstance {
-  return value.nodeType === TEMPLATE_INSTANCE;
+  return value.dynamicNodes;
 }
 
 export interface TemplateInstance {
@@ -35,7 +34,6 @@ export interface TemplateInstance {
   firstNode: Node;
   lastNode: Node;
   children: TemplateInstanceChildren;
-  nodeType: number;
 }
 
 export function createTemplateInstance(res: TemplateResult): TemplateInstance {
@@ -58,8 +56,7 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
     parts,
     firstNode,
     lastNode,
-    children,
-    nodeType: TEMPLATE_INSTANCE
+    children
   };
 
   for (let i = 0; i < parts.length; i++) {

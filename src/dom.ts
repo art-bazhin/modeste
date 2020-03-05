@@ -5,7 +5,7 @@ import {
   createTemplateInstance,
   isTemplateInstance
 } from './template-instance';
-import { TEMPLATE_INSTANCE, STRING } from './constants';
+import { TEMPLATE_RESULT, STRING } from './constants';
 import { isTemplateResult } from './template-result';
 
 export function isDOMNode(value: any): value is HTMLElement | Text {
@@ -34,7 +34,7 @@ export function updateChild(
     case STRING:
       (child as Text).textContent = value;
       return child;
-    case TEMPLATE_INSTANCE:
+    case TEMPLATE_RESULT:
       return updateTemplateInstance(child as TemplateInstance, value.values);
     default:
       const newNode = insertBefore(value, child);
@@ -106,7 +106,7 @@ function hasSameType(value: any, oldValue: any) {
     oldValueIsTemplateResult &&
     value.strings === oldValue.strings
   )
-    return TEMPLATE_INSTANCE;
+    return TEMPLATE_RESULT;
 
   if (
     !valueIsTemplateResult &&

@@ -8,8 +8,8 @@ export const ATTR_MARK = MARK + '-attr';
 export const ATTR_NUM_SEPARATOR = '_';
 export const PLACEHOLDER_COMMENT = '<!--' + PLACEHOLDER_MARK + '-->';
 
-export const TEMPLATE_INSTANCE = 42;
-export const STRING = 43;
+export const TEMPLATE_RESULT = 1;
+export const STRING = 2;
 
 export const NODE_PART = 1;
 export const ATTR_PART = 2;
