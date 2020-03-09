@@ -3,11 +3,6 @@ import { TemplateResult, getTemplateResultHTML } from './template-result';
 import { TemplatePart, getTemplatePartsFromElement } from './template-part';
 import { isCommentNode, isElementNode } from './dom';
 
-const testNode = document.createElement('div');
-testNode.appendChild(document.createTextNode(''));
-
-const isIE = !testNode.cloneNode(true).firstChild;
-
 const templatesMap = new Map<TemplateStringsArray, Template>();
 
 export interface Template {
@@ -86,6 +81,6 @@ export function getTemplate(res: TemplateResult): Template {
 }
 
 function createMarkNode() {
-  if (isIE) return document.createComment('');
+  if ((document as any).documentMode) return document.createComment(''); // IE
   return document.createTextNode('');
 }
