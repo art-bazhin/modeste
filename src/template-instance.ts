@@ -17,7 +17,7 @@ import {
 
 export type TemplateInstanceChild = TemplateInstance | HTMLElement | Text;
 
-type ChildrenMap = Map<any, TemplateInstanceChild> | null;
+type ChildrenMap = Map<any, TemplateInstanceChild>;
 type ChildrenArray = TemplateInstanceChild[];
 
 interface TemplateInstanceChildrenArrays {
@@ -25,7 +25,7 @@ interface TemplateInstanceChildrenArrays {
 }
 
 interface TemplateInstanceChildrenMaps {
-  [key: number]: ChildrenMap;
+  [key: number]: ChildrenMap | null;
 }
 
 export function isTemplateInstance(value: any): value is TemplateInstance {
@@ -89,7 +89,7 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
         const arr = valueToArray(value);
 
         const c: TemplateInstanceChild[] = [];
-        let cm: ChildrenMap = null;
+        let cm: ChildrenMap | null = null;
 
         let isKeyed = arr[0]?.key;
 
@@ -143,12 +143,19 @@ export function updateTemplateInstance(
         const oldValueArray = valueToArray(oldValue);
 
         const childrenArray: ChildrenArray = [];
-        let childrenMap: ChildrenMap = null;
+        let childrenMap: ChildrenMap = new Map();
 
         const oldChildrenArray = instanceChildrenArrays[i];
         const oldChildrenMap = instanceChildrenMaps[i];
 
-        let isKeyed = valueArray[0]?.key;
+        let isKeyed =
+          valueArray.length &&
+          valueArray.every(value => {
+            if (!isKeyedTemplateResult(value)) return false;
+            if (childrenMap.has(value.key)) return false;
+            childrenMap.set(value.key, null as any);
+            return true;
+          });
 
         if (!oldChildrenMap || !isKeyed) {
           const min = Math.min(valueArray.length, oldValueArray.length);
@@ -174,12 +181,7 @@ export function updateTemplateInstance(
 
             childrenArray.push(child);
 
-            if (isKeyed && isKeyedTemplateResult(item)) {
-              if (!childrenMap)
-                childrenMap = new Map<any, TemplateInstanceChild>();
-              if (childrenMap.has(item.key)) isKeyed = false;
-              else childrenMap.set(item.key, child);
-            } else isKeyed = false;
+            if (isKeyed) childrenMap.set(item.key, child);
           }
 
           if (newArrayIsSmaller) {
