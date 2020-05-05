@@ -35,6 +35,7 @@ export interface TemplateResult {
   strings: TemplateStringsArray;
   values: any[];
   isSVG?: boolean;
+  key?: any;
 }
 
 export function getTemplateResultHTML(res: TemplateResult) {
@@ -44,6 +45,10 @@ export function getTemplateResultHTML(res: TemplateResult) {
 
 export function isTemplateResult(res: any): res is TemplateResult {
   return res.strings;
+}
+
+export function isKeyedTemplateResult(res: any): res is TemplateResult {
+  return res.strings && res.key;
 }
 
 export function createTemplateResult(

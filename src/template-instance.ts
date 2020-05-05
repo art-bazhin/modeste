@@ -5,7 +5,7 @@ import {
   NODE_PART,
   REF_ATTR_NAME
 } from './constants';
-import { TemplateResult } from './template-result';
+import { TemplateResult, isKeyedTemplateResult } from './template-result';
 import { TemplatePart } from './template-part';
 import { getTemplate, Template } from './template';
 import {
@@ -17,8 +17,15 @@ import {
 
 export type TemplateInstanceChild = TemplateInstance | HTMLElement | Text;
 
-interface TemplateInstanceChildren {
-  [key: number]: TemplateInstanceChild[];
+type ChildrenMap = Map<any, TemplateInstanceChild> | null;
+type ChildrenArray = TemplateInstanceChild[];
+
+interface TemplateInstanceChildrenArrays {
+  [key: number]: ChildrenArray;
+}
+
+interface TemplateInstanceChildrenMaps {
+  [key: number]: ChildrenMap;
 }
 
 export function isTemplateInstance(value: any): value is TemplateInstance {
@@ -33,7 +40,8 @@ export interface TemplateInstance {
   dynamicNodes: Node[];
   firstNode: Node;
   lastNode: Node;
-  children: TemplateInstanceChildren;
+  childrenArrays: TemplateInstanceChildrenArrays;
+  childrenMaps: TemplateInstanceChildrenMaps;
 }
 
 export function createTemplateInstance(res: TemplateResult): TemplateInstance {
@@ -46,7 +54,9 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
   );
   const firstNode = fragment.firstChild as any;
   const lastNode = fragment.lastChild as any;
-  const children: TemplateInstanceChildren = {};
+
+  const childrenArrays: TemplateInstanceChildrenArrays = {};
+  const childrenMaps: TemplateInstanceChildrenMaps = {};
 
   const instance = {
     template,
@@ -56,7 +66,8 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
     parts,
     firstNode,
     lastNode,
-    children
+    childrenArrays,
+    childrenMaps
   };
 
   for (let i = 0; i < parts.length; i++) {
@@ -76,10 +87,27 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
         break;
       default:
         const arr = valueToArray(value);
-        const c: TemplateInstanceChild[] = [];
 
-        for (let i = 0; i < arr.length; i++) c.push(insertBefore(arr[i], node));
-        children[i] = c;
+        const c: TemplateInstanceChild[] = [];
+        let cm: ChildrenMap = null;
+
+        let isKeyed = arr[0]?.key;
+
+        for (let i = 0; i < arr.length; i++) {
+          const item = arr[i];
+          const child = insertBefore(item, node);
+
+          c.push(child);
+
+          if (isKeyed && isKeyedTemplateResult(item)) {
+            if (!cm) cm = new Map<any, TemplateInstanceChild>();
+            if (cm.has(item.key)) isKeyed = false;
+            else cm.set(item.key, child);
+          } else isKeyed = false;
+        }
+
+        childrenArrays[i] = c;
+        childrenMaps[i] = isKeyed ? cm : null;
     }
   }
 
@@ -91,7 +119,8 @@ export function updateTemplateInstance(
   values: any[]
 ): TemplateInstance {
   const parts = instance.template.parts;
-  const instanceChildren = instance.children;
+  const instanceChildrenArrays = instance.childrenArrays;
+  const instanceChildrenMaps = instance.childrenMaps;
 
   for (let i = 0; i < parts.length; i++) {
     const value = values[i];
@@ -113,36 +142,63 @@ export function updateTemplateInstance(
         const valueArray = valueToArray(value);
         const oldValueArray = valueToArray(oldValue);
 
-        const children: TemplateInstanceChild[] = [];
-        const oldChildren = instanceChildren[i];
+        const childrenArray: ChildrenArray = [];
+        let childrenMap: ChildrenMap = null;
 
-        const min = Math.min(valueArray.length, oldValueArray.length);
-        const max = Math.max(valueArray.length, oldValueArray.length);
-        const dif = max - min;
+        const oldChildrenArray = instanceChildrenArrays[i];
+        const oldChildrenMap = instanceChildrenMaps[i];
 
-        for (let i = 0; i < min; i++)
-          children.push(
-            updateChild(valueArray[i], oldValueArray[i], oldChildren[i])
-          );
+        let isKeyed = valueArray[0]?.key;
 
-        if (valueArray.length > oldValueArray.length) {
-          for (let i = min; i < max; i++) {
-            children.push(insertBefore(valueArray[i], node));
+        if (!oldChildrenMap || !isKeyed) {
+          const min = Math.min(valueArray.length, oldValueArray.length);
+          const max = Math.max(valueArray.length, oldValueArray.length);
+          const dif = max - min;
+
+          const newArrayIsBigger = valueArray.length > oldValueArray.length;
+          const newArrayIsSmaller = dif && !newArrayIsBigger;
+
+          for (let i = 0; i < max; i++) {
+            const item = valueArray[i];
+            let child: TemplateInstanceChild;
+
+            if (i < min)
+              child = updateChild(
+                valueArray[i],
+                oldValueArray[i],
+                oldChildrenArray[i]
+              );
+            else if (newArrayIsBigger)
+              child = insertBefore(valueArray[i], node);
+            else break;
+
+            childrenArray.push(child);
+
+            if (isKeyed && isKeyedTemplateResult(item)) {
+              if (!childrenMap)
+                childrenMap = new Map<any, TemplateInstanceChild>();
+              if (childrenMap.has(item.key)) isKeyed = false;
+              else childrenMap.set(item.key, child);
+            } else isKeyed = false;
           }
-        } else if (dif) {
-          const start = oldChildren[min];
-          removeNodes(
-            isTemplateInstance(start) ? start.firstNode : start,
-            node.previousSibling!
-          );
-        }
 
-        instanceChildren[i] = children;
+          if (newArrayIsSmaller) {
+            const start = oldChildrenArray[min];
+            removeNodes(
+              isTemplateInstance(start) ? start.firstNode : start,
+              node.previousSibling!
+            );
+          }
+
+          instanceChildrenArrays[i] = childrenArray;
+          instanceChildrenMaps[i] = isKeyed ? childrenMap : null;
+        }
     }
   }
 
   instance.values = values;
 
+  console.log(instance);
   return instance;
 }
 
