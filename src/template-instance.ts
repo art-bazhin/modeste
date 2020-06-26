@@ -3,7 +3,7 @@ import {
   EVENT_PART,
   REF_PART,
   NODE_PART,
-  REF_ATTR_NAME
+  REF_ATTR_NAME,
 } from './constants';
 import { TemplateResult, isKeyedTemplateResult } from './template-result';
 import { TemplatePart } from './template-part';
@@ -12,8 +12,9 @@ import {
   insertBefore,
   updateChild,
   getNodeFromPosition,
-  removeNodes
+  removeNodes,
 } from './dom';
+import { warning } from './utils';
 
 export type TemplateInstanceChild = TemplateInstance | HTMLElement | Text;
 
@@ -49,7 +50,7 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
   const parts = template.parts;
   const values = res.values;
   const fragment = template.fragment.cloneNode(true) as DocumentFragment;
-  const dynamicNodes = parts.map(part =>
+  const dynamicNodes = parts.map((part) =>
     getNodeFromPosition(part.position, fragment)
   );
   const firstNode = fragment.firstChild as any;
@@ -67,7 +68,7 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
     firstNode,
     lastNode,
     childrenArrays,
-    childrenMaps
+    childrenMaps,
   };
 
   for (let i = 0; i < parts.length; i++) {
@@ -101,8 +102,11 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
 
           if (isKeyed && isKeyedTemplateResult(item)) {
             if (!cm) cm = new Map<any, TemplateInstanceChild>();
-            if (cm.has(item.key)) isKeyed = false;
-            else cm.set(item.key, child);
+
+            if (cm.has(item.key)) {
+              isKeyed = false;
+              showKeyDuplicaeWarning(item);
+            } else cm.set(item.key, child);
           } else isKeyed = false;
         }
 
@@ -150,14 +154,21 @@ export function updateTemplateInstance(
 
         let isKeyed =
           valueArray.length &&
-          valueArray.every(value => {
+          valueArray.every((value) => {
             if (!isKeyedTemplateResult(value)) return false;
-            if (childrenMap.has(value.key)) return false;
+
+            if (childrenMap.has(value.key)) {
+              showKeyDuplicaeWarning(value);
+              return false;
+            }
+
             childrenMap.set(value.key, null as any);
             return true;
           });
 
-        if (!oldChildrenMap || !isKeyed) {
+        if (oldChildrenMap && isKeyed) {
+          console.log('KEYED RENDER', oldChildrenMap);
+        } else {
           const min = Math.min(valueArray.length, oldValueArray.length);
           const max = Math.max(valueArray.length, oldValueArray.length);
           const dif = max - min;
@@ -200,7 +211,7 @@ export function updateTemplateInstance(
 
   instance.values = values;
 
-  console.log(instance);
+  // console.log(instance);
   return instance;
 }
 
@@ -239,4 +250,8 @@ function processEvent(
 function processRef(value: any, node: Element, isFirstRender?: boolean) {
   if (value) value(node);
   if (isFirstRender) node.removeAttribute(REF_ATTR_NAME);
+}
+
+function showKeyDuplicaeWarning(res: TemplateResult) {
+  warning('Key duplicate was found. Switched to non-keyed render.', res);
 }
