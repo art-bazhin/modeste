@@ -1,7 +1,7 @@
 import {
   createTemplateInstance,
   updateTemplateInstance,
-  TemplateInstance
+  TemplateInstance,
 } from './template-instance';
 import { TemplateResult } from './template-result';
 import { getTemplate } from './template';
@@ -18,6 +18,6 @@ export function render(res: TemplateResult, container: HTMLElement) {
     instances.set(container, instance);
     container.appendChild(instance.fragment);
   } else {
-    updateTemplateInstance(instance, res.values);
+    updateTemplateInstance(instance, res);
   }
 }

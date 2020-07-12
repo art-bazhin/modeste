@@ -3,10 +3,11 @@ import {
   TemplateInstanceChild,
   updateTemplateInstance,
   createTemplateInstance,
-  isTemplateInstance
+  isTemplateInstance,
 } from './template-instance';
-import { TEMPLATE_RESULT, STRING } from './constants';
+import { TEMPLATE_RESULT, STRING, COMPONENT } from './constants';
 import { isTemplateResult } from './template-result';
+import { isComponent, Component } from './component';
 
 export function isDOMNode(value: any): value is HTMLElement | Text {
   return value.nodeType;
@@ -35,7 +36,8 @@ export function updateChild(
       (child as Text).textContent = value;
       return child;
     case TEMPLATE_RESULT:
-      return updateTemplateInstance(child as TemplateInstance, value.values);
+    case COMPONENT:
+      return updateTemplateInstance(child as TemplateInstance, value);
     default:
       const newNode = insertBefore(value, child);
       removeChild(child);
@@ -77,7 +79,7 @@ export function insertBefore(value: any, refChild: Node | TemplateInstance) {
   const refNode = isTemplateInstance(refChild) ? refChild.firstNode : refChild;
   const parent = refNode.parentNode!;
 
-  if (isTemplateResult(value)) {
+  if (isTemplateResult(value) || isComponent(value)) {
     const instance = createTemplateInstance(value);
     parent.insertBefore(instance.fragment, refNode);
     return instance;
@@ -101,6 +103,12 @@ function hasSameType(value: any, oldValue: any) {
   const valueIsTemplateResult = isTemplateResult(value);
   const oldValueIsTemplateResult = isTemplateResult(oldValue);
 
+  const valueIsComponent = isComponent(value);
+  const oldValueIsComponent = isComponent(oldValue);
+
+  if (valueIsComponent && oldValueIsComponent && value.fn === oldValue.fn)
+    return COMPONENT;
+
   if (
     valueIsTemplateResult &&
     oldValueIsTemplateResult &&
@@ -109,6 +117,8 @@ function hasSameType(value: any, oldValue: any) {
     return TEMPLATE_RESULT;
 
   if (
+    !valueIsComponent &&
+    !oldValueIsComponent &&
     !valueIsTemplateResult &&
     !oldValueIsTemplateResult &&
     !isDOMNode(value) &&

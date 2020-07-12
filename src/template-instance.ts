@@ -15,6 +15,11 @@ import {
   removeNodes,
 } from './dom';
 import { warning } from './utils';
+import {
+  Component,
+  isComponent,
+  getComponentTemplateResult,
+} from './component';
 
 export type TemplateInstanceChild = TemplateInstance | HTMLElement | Text;
 
@@ -43,9 +48,24 @@ export interface TemplateInstance {
   lastNode: Node;
   childrenArrays: TemplateInstanceChildrenArrays;
   childrenMaps: TemplateInstanceChildrenMaps;
+  state: any[];
 }
 
-export function createTemplateInstance(res: TemplateResult): TemplateInstance {
+export function createTemplateInstance(
+  resultOrComponent: TemplateResult | Component<any>
+): TemplateInstance {
+  const instance = {
+    state: [] as any[],
+  } as TemplateInstance;
+
+  let res: TemplateResult;
+
+  if (isComponent(resultOrComponent)) {
+    res = getComponentTemplateResult(resultOrComponent, instance);
+  } else {
+    res = resultOrComponent;
+  }
+
   const template = getTemplate(res);
   const parts = template.parts;
   const values = res.values;
@@ -58,18 +78,6 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
 
   const childrenArrays: TemplateInstanceChildrenArrays = {};
   const childrenMaps: TemplateInstanceChildrenMaps = {};
-
-  const instance = {
-    template,
-    fragment,
-    dynamicNodes,
-    values,
-    parts,
-    firstNode,
-    lastNode,
-    childrenArrays,
-    childrenMaps,
-  };
 
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
@@ -115,13 +123,33 @@ export function createTemplateInstance(res: TemplateResult): TemplateInstance {
     }
   }
 
-  return instance;
+  instance.template = template;
+  instance.fragment = fragment;
+  instance.dynamicNodes = dynamicNodes;
+  instance.values = values;
+  instance.parts = parts;
+  instance.firstNode = firstNode;
+  instance.lastNode = lastNode;
+  instance.childrenArrays = childrenArrays;
+  instance.childrenMaps = childrenMaps;
+
+  return instance as TemplateInstance;
 }
 
 export function updateTemplateInstance(
   instance: TemplateInstance,
-  values: any[]
+  resultOrComponent?: TemplateResult | Component<any>
 ): TemplateInstance {
+  let values: any[];
+
+  if (!resultOrComponent) {
+    values = instance.values;
+  } else if (isComponent(resultOrComponent)) {
+    values = getComponentTemplateResult(resultOrComponent, instance).values;
+  } else {
+    values = resultOrComponent.values;
+  }
+
   const parts = instance.template.parts;
   const instanceChildrenArrays = instance.childrenArrays;
   const instanceChildrenMaps = instance.childrenMaps;
