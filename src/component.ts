@@ -18,7 +18,7 @@ export function component<T>(fn: (props: T) => TemplateResult) {
 }
 
 export function isComponent(obj: any): obj is Component<any> {
-  return obj.props && obj.fn;
+  return obj.fn;
 }
 
 export function getComponentTemplateResult(
