@@ -4,10 +4,11 @@ import {
   updateTemplateInstance,
   createTemplateInstance,
   isTemplateInstance,
+  runTemplateInstanceDestructors,
 } from './template-instance';
 import { TEMPLATE_RESULT, STRING, COMPONENT } from './constants';
 import { isTemplateResult } from './template-result';
-import { isComponent, Component } from './component';
+import { isComponent } from './component';
 
 export function isDOMNode(value: any): value is HTMLElement | Text {
   return value.nodeType;
@@ -50,6 +51,9 @@ export function removeNodes(start: Node, end: Node) {
   let node = start;
 
   while (node !== end) {
+    const instance = (node as any).__MDST_INSTANCE__;
+    if (instance) runTemplateInstanceDestructors(instance);
+
     const next = node.nextSibling!;
     parent.removeChild(node);
     node = next;

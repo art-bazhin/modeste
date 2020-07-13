@@ -23,6 +23,9 @@ export function getTemplate(res: TemplateResult): Template {
 
   const fragment = templateElement.content;
 
+  if (isPlaceholder(fragment.firstChild))
+    fragment.insertBefore(createMarkNode(), fragment.firstChild);
+
   if (res.isSVG) {
     const svgRoot = fragment.firstChild!;
 
@@ -40,7 +43,7 @@ export function getTemplate(res: TemplateResult): Template {
   while (node) {
     let parent = node.parentNode;
 
-    if (isCommentNode(node) && node.textContent === PLACEHOLDER_MARK) {
+    if (isPlaceholder(node)) {
       const mark = createMarkNode();
 
       parts.push({ type: NODE_PART, position: position.slice() });
@@ -72,7 +75,7 @@ export function getTemplate(res: TemplateResult): Template {
 
   const template = {
     fragment,
-    parts
+    parts,
   };
 
   templatesMap.set(strings, template);
@@ -83,4 +86,8 @@ export function getTemplate(res: TemplateResult): Template {
 function createMarkNode() {
   if ((document as any).documentMode) return document.createComment(''); // IE
   return document.createTextNode('');
+}
+
+function isPlaceholder(node: Node | null) {
+  return node && isCommentNode(node) && node.textContent === PLACEHOLDER_MARK;
 }

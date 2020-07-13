@@ -49,6 +49,7 @@ export interface TemplateInstance {
   childrenArrays: TemplateInstanceChildrenArrays;
   childrenMaps: TemplateInstanceChildrenMaps;
   state: any[];
+  desctructor: () => void;
 }
 
 export function createTemplateInstance(
@@ -132,6 +133,9 @@ export function createTemplateInstance(
   instance.lastNode = lastNode;
   instance.childrenArrays = childrenArrays;
   instance.childrenMaps = childrenMaps;
+  instance.desctructor = () => 1 + 1;
+
+  firstNode.__MDST_INSTANCE__ = instance;
 
   return instance as TemplateInstance;
 }
@@ -241,6 +245,18 @@ export function updateTemplateInstance(
 
   // console.log(instance);
   return instance;
+}
+
+export function runTemplateInstanceDestructors(instance: TemplateInstance) {
+  if (instance.desctructor) instance.desctructor();
+
+  const arrays = instance.childrenArrays;
+
+  Object.keys(arrays).forEach((i: any) => {
+    arrays[i].forEach((child) => {
+      if (isTemplateInstance(child)) runTemplateInstanceDestructors(child);
+    });
+  });
 }
 
 function valueToArray(value: any) {
