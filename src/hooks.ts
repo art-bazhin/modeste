@@ -78,10 +78,7 @@ export function removeInstanceFromRenderQueue(instance: TemplateInstance) {
 function render(instance: TemplateInstance, hookedResult: HookedResult<any>) {
   renderQueue.set(instance, hookedResult);
 
-  nextTick(() => {
-    if (!renderQueue.size) return;
-    flushRenderQueue();
-  });
+  nextTick(flushRenderQueue);
 }
 
 function renderInstance(
@@ -96,5 +93,4 @@ function renderInstance(
 
 function flushRenderQueue() {
   renderQueue.forEach(renderInstance);
-  renderQueue.clear();
 }
