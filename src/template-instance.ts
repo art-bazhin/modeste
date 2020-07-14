@@ -15,7 +15,12 @@ import {
   removeNodes,
 } from './dom';
 import { warning } from './utils';
-import { HookedResult, isHookedResult, getHookedTemplateResult } from './hooks';
+import {
+  HookedResult,
+  isHookedResult,
+  getHookedTemplateResult,
+  removeInstanceFromRenderQueue,
+} from './hooks';
 
 export type TemplateInstanceChild = TemplateInstance | HTMLElement | Text;
 
@@ -45,7 +50,8 @@ export interface TemplateInstance {
   childrenArrays: TemplateInstanceChildrenArrays;
   childrenMaps: TemplateInstanceChildrenMaps;
   state: any[];
-  desctructor: () => void;
+  effects: (() => void)[];
+  desctructor?: () => void;
 }
 
 export function createTemplateInstance(
@@ -53,6 +59,7 @@ export function createTemplateInstance(
 ): TemplateInstance {
   const instance = {
     state: [] as any[],
+    effects: [] as any[],
   } as TemplateInstance;
 
   let res: TemplateResult;
@@ -129,7 +136,6 @@ export function createTemplateInstance(
   instance.lastNode = lastNode;
   instance.childrenArrays = childrenArrays;
   instance.childrenMaps = childrenMaps;
-  instance.desctructor = () => 1 + 1;
 
   firstNode.__MDST_INSTANCE__ = instance;
 
@@ -239,7 +245,8 @@ export function updateTemplateInstance(
 
   instance.values = values;
 
-  // console.log(instance);
+  removeInstanceFromRenderQueue(instance);
+
   return instance;
 }
 
@@ -254,6 +261,8 @@ export function runTemplateInstanceDestructors(instance: TemplateInstance) {
     });
   });
 }
+
+function runTemplateInstanceEffects(instance: TemplateInstance) {}
 
 function valueToArray(value: any) {
   if (Array.isArray(value)) return value.length ? (value as any[]) : [''];
