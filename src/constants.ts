@@ -8,7 +8,7 @@ export const PLACEHOLDER_COMMENT = '<!--' + PLACEHOLDER_MARK + '-->';
 
 export const TEMPLATE_RESULT = 1;
 export const STRING = 2;
-export const COMPONENT = 3;
+export const HOOKED = 3;
 
 export const NODE_PART = 1;
 export const ATTR_PART = 2;

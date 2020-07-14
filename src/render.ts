@@ -5,34 +5,42 @@ import {
 } from './template-instance';
 import { TemplateResult } from './template-result';
 import { getTemplate } from './template';
-import { Component, isComponent } from './component';
+import { HookedResult, isHookedResult } from './hooks';
 
 const instances = new Map<HTMLElement, TemplateInstance>();
-const componentFunctions = new Map<HTMLElement, (p: any) => TemplateResult>();
+const hookedFunctions = new Map<HTMLElement, (p: any) => TemplateResult>();
 
-export function render(resultOrComponent: TemplateResult | Component<any>, container: HTMLElement) {
+export function render(
+  result: TemplateResult | HookedResult<any>,
+  container: HTMLElement
+) {
   const instance = instances.get(container);
 
   let shouldCreateInstance = false;
-  let componentRender = false;
+  let hookedRender = false;
 
-  if (isComponent(resultOrComponent)) {
-    shouldCreateInstance = !instance || (componentFunctions.get(container) !== resultOrComponent.fn);
-    componentRender = true;
+  if (isHookedResult(result)) {
+    shouldCreateInstance =
+      !instance || hookedFunctions.get(container) !== result.getTemplateResult;
+    hookedRender = true;
   } else {
-    shouldCreateInstance = !instance || (getTemplate(resultOrComponent) !== instance.template);
-  };
-
+    shouldCreateInstance =
+      !instance || getTemplate(result) !== instance.template;
+  }
 
   if (shouldCreateInstance) {
     container.innerHTML = '';
-    const instance = createTemplateInstance(resultOrComponent);
+    const instance = createTemplateInstance(result);
     instances.set(container, instance);
     container.appendChild(instance.fragment);
 
-    if (componentRender) componentFunctions.set(container, (resultOrComponent as Component<any>).fn);
-    else componentFunctions.delete(container);
+    if (hookedRender)
+      hookedFunctions.set(
+        container,
+        (result as HookedResult<any>).getTemplateResult
+      );
+    else hookedFunctions.delete(container);
   } else {
-    updateTemplateInstance(instance!, resultOrComponent);
+    updateTemplateInstance(instance!, result);
   }
 }

@@ -15,11 +15,7 @@ import {
   removeNodes,
 } from './dom';
 import { warning } from './utils';
-import {
-  Component,
-  isComponent,
-  getComponentTemplateResult,
-} from './component';
+import { HookedResult, isHookedResult, getHookedTemplateResult } from './hooks';
 
 export type TemplateInstanceChild = TemplateInstance | HTMLElement | Text;
 
@@ -53,7 +49,7 @@ export interface TemplateInstance {
 }
 
 export function createTemplateInstance(
-  resultOrComponent: TemplateResult | Component<any>
+  result: TemplateResult | HookedResult<any>
 ): TemplateInstance {
   const instance = {
     state: [] as any[],
@@ -61,10 +57,10 @@ export function createTemplateInstance(
 
   let res: TemplateResult;
 
-  if (isComponent(resultOrComponent)) {
-    res = getComponentTemplateResult(resultOrComponent, instance);
+  if (isHookedResult(result)) {
+    res = getHookedTemplateResult(result, instance);
   } else {
-    res = resultOrComponent;
+    res = result;
   }
 
   const template = getTemplate(res);
@@ -142,16 +138,16 @@ export function createTemplateInstance(
 
 export function updateTemplateInstance(
   instance: TemplateInstance,
-  resultOrComponent?: TemplateResult | Component<any>
+  result?: TemplateResult | HookedResult<any>
 ): TemplateInstance {
   let values: any[];
 
-  if (!resultOrComponent) {
+  if (!result) {
     values = instance.values;
-  } else if (isComponent(resultOrComponent)) {
-    values = getComponentTemplateResult(resultOrComponent, instance).values;
+  } else if (isHookedResult(result)) {
+    values = getHookedTemplateResult(result, instance).values;
   } else {
-    values = resultOrComponent.values;
+    values = result.values;
   }
 
   const parts = instance.template.parts;
