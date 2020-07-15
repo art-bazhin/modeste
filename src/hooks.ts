@@ -20,6 +20,7 @@ let currentIndex = 0;
 export interface HookedResult<T extends unknown[]> {
   getTemplateResult: (...args: T) => TemplateResult;
   args: T;
+  key?: any;
 }
 
 export function hooked<T extends unknown[]>(
@@ -31,8 +32,12 @@ export function hooked<T extends unknown[]>(
   });
 }
 
-export function isHookedResult(obj: any): obj is HookedResult<any> {
-  return obj.getTemplateResult;
+export function isHookedResult(res: any): res is HookedResult<any> {
+  return res.getTemplateResult;
+}
+
+export function isKeyedHookedResult(res: any): res is HookedResult<any> {
+  return isHookedResult(res) && res.key;
 }
 
 export function getHookedTemplateResult(

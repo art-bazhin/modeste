@@ -13,6 +13,7 @@ import {
   updateChild,
   getNodeFromPosition,
   removeNodes,
+  insertTemplateInstanceBefore,
 } from './dom';
 import { warning } from './utils';
 import {
@@ -20,11 +21,12 @@ import {
   isHookedResult,
   getHookedTemplateResult,
   removeInstanceFromRenderQueue,
+  isKeyedHookedResult,
 } from './hooks';
 
 export type TemplateInstanceChild = TemplateInstance | HTMLElement | Text;
 
-type ChildrenMap = Map<any, TemplateInstanceChild>;
+type ChildrenMap = Map<any, TemplateInstance>;
 type ChildrenArray = TemplateInstanceChild[];
 
 interface TemplateInstanceChildrenArrays {
@@ -101,8 +103,8 @@ export function createTemplateInstance(
       default:
         const arr = valueToArray(value);
 
-        const c: TemplateInstanceChild[] = [];
-        let cm: ChildrenMap | null = null;
+        const childrenArray: TemplateInstanceChild[] = [];
+        let childrenMap: ChildrenMap | null = null;
 
         let isKeyed = arr[0]?.key;
 
@@ -110,20 +112,23 @@ export function createTemplateInstance(
           const item = arr[i];
           const child = insertBefore(item, node);
 
-          c.push(child);
+          childrenArray.push(child);
 
-          if (isKeyed && isKeyedTemplateResult(item)) {
-            if (!cm) cm = new Map<any, TemplateInstanceChild>();
+          if (
+            isKeyed &&
+            (isKeyedTemplateResult(item) || isKeyedHookedResult(item))
+          ) {
+            if (!childrenMap) childrenMap = new Map<any, TemplateInstance>();
 
-            if (cm.has(item.key)) {
+            if (childrenMap.has(item.key)) {
               isKeyed = false;
-              showKeyDuplicaeWarning(item);
-            } else cm.set(item.key, child);
+              showKeyDuplicateWarning(item);
+            } else childrenMap.set(item.key, child as TemplateInstance);
           } else isKeyed = false;
         }
 
-        childrenArrays[i] = c;
-        childrenMaps[i] = isKeyed ? cm : null;
+        childrenArrays[i] = childrenArray;
+        childrenMaps[i] = isKeyed ? childrenMap : null;
     }
   }
 
@@ -189,10 +194,11 @@ export function updateTemplateInstance(
         let isKeyed =
           valueArray.length &&
           valueArray.every((value) => {
-            if (!isKeyedTemplateResult(value)) return false;
+            if (!(isKeyedTemplateResult(value) || isKeyedHookedResult(value)))
+              return false;
 
             if (childrenMap.has(value.key)) {
-              showKeyDuplicaeWarning(value);
+              showKeyDuplicateWarning(value);
               return false;
             }
 
@@ -201,7 +207,48 @@ export function updateTemplateInstance(
           });
 
         if (oldChildrenMap && isKeyed) {
-          console.log('KEYED RENDER', oldChildrenMap);
+          // Remove redundant nodes
+          let removeStart: Node | null = null;
+          let removeEnd: Node | null = null;
+
+          oldChildrenMap.forEach((child, key) => {
+            if (!childrenMap.has(key)) {
+              if (!removeStart) removeStart = child.firstNode;
+              removeEnd = child.lastNode;
+
+              oldChildrenMap.delete(key);
+            } else {
+              if (removeStart && removeEnd) removeNodes(removeStart, removeEnd);
+              removeStart = null;
+              removeEnd = null;
+            }
+          });
+
+          if (removeStart && removeEnd) removeNodes(removeStart, removeEnd);
+
+          // Insert new nodes and replace old
+          let w = 1;
+          const weights = new Map<any, number>();
+          oldChildrenMap.forEach((value, key) => weights.set(key, w++));
+
+          const lis = getLISSet(Array.from(childrenMap.keys()), weights);
+          let currentNode: Node = node;
+
+          for (let i = valueArray.length - 1; i >= 0; i--) {
+            const value: TemplateResult = valueArray[i];
+            const key = value.key;
+            let instance = oldChildrenMap.get(key);
+
+            if (instance) updateTemplateInstance(instance, value);
+            else instance = createTemplateInstance(value);
+
+            if (!lis.has(key))
+              insertTemplateInstanceBefore(instance, currentNode);
+            currentNode = instance.firstNode;
+
+            childrenArray.unshift(instance);
+            childrenMap.set(key, instance);
+          }
         } else {
           const min = Math.min(valueArray.length, oldValueArray.length);
           const max = Math.max(valueArray.length, oldValueArray.length);
@@ -226,7 +273,7 @@ export function updateTemplateInstance(
 
             childrenArray.push(child);
 
-            if (isKeyed) childrenMap.set(item.key, child);
+            if (isKeyed) childrenMap.set(item.key, child as TemplateInstance);
           }
 
           if (newArrayIsSmaller) {
@@ -236,10 +283,10 @@ export function updateTemplateInstance(
               node.previousSibling!
             );
           }
-
-          instanceChildrenArrays[i] = childrenArray;
-          instanceChildrenMaps[i] = isKeyed ? childrenMap : null;
         }
+
+        instanceChildrenArrays[i] = childrenArray;
+        instanceChildrenMaps[i] = isKeyed ? childrenMap : null;
     }
   }
 
@@ -260,6 +307,50 @@ export function runTemplateInstanceDestructors(instance: TemplateInstance) {
       if (isTemplateInstance(child)) runTemplateInstanceDestructors(child);
     });
   });
+}
+
+// Get set of items from longest increasing subsequence
+function getLISSet(arr: any[], weights: Map<any, number>) {
+  const indexes: number[] = []; // indexes[i] is the index of last number of i-length IS
+  const predecessors: number[] = []; // predecessors[i] is the index of element before indexes[i] in LIS
+
+  let lisLength = 0;
+
+  for (let i = 0; i < arr.length; i++) {
+    // Binary search for the max length of IS with last number <= arr[i]
+    let left = 1;
+    let right = lisLength;
+    let mid: number;
+
+    const weight = weights.get(arr[i]);
+    if (!weight) continue;
+
+    while (left <= right) {
+      mid = Math.ceil((left + right) / 2);
+
+      if (weights.get(arr[indexes[mid]])! < weight) left = mid + 1;
+      else right = mid - 1;
+    }
+
+    // After searching left is new length
+    const newLength = left;
+
+    predecessors[i] = indexes[newLength - 1];
+    indexes[newLength] = i;
+
+    if (newLength > lisLength) lisLength = newLength;
+  }
+
+  // Reconstruct the longest increasing subsequence
+  const res = new Set<any>();
+  let k = indexes[lisLength];
+
+  for (let i = lisLength - 1; i >= 0; i--) {
+    res.add(arr[k]);
+    k = predecessors[k];
+  }
+
+  return res;
 }
 
 function runTemplateInstanceEffects(instance: TemplateInstance) {}
@@ -301,6 +392,6 @@ function processRef(value: any, node: Element, isFirstRender?: boolean) {
   if (isFirstRender) node.removeAttribute(REF_ATTR_NAME);
 }
 
-function showKeyDuplicaeWarning(res: TemplateResult) {
+function showKeyDuplicateWarning(res: TemplateResult | HookedResult<any>) {
   warning('Key duplicate was found. Switched to non-keyed render.', res);
 }

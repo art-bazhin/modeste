@@ -34,7 +34,6 @@ function replaceTag(tag: string) {
 export interface TemplateResult {
   strings: TemplateStringsArray;
   values: any[];
-  keyed: (key: any) => this;
   isSVG?: boolean;
   key?: any;
 }
@@ -49,24 +48,19 @@ export function isTemplateResult(res: any): res is TemplateResult {
 }
 
 export function isKeyedTemplateResult(res: any): res is TemplateResult {
-  return res.strings && res.key;
+  return isTemplateResult(res) && res.key;
 }
 
 export function createTemplateResult(
   strings: TemplateStringsArray,
   ...values: any[]
 ): TemplateResult {
-  return { strings, values, keyed };
+  return { strings, values };
 }
 
 export function createSVGTemplateResult(
   strings: TemplateStringsArray,
   ...values: any[]
 ): TemplateResult {
-  return { strings, values, isSVG: true, keyed };
-}
-
-function keyed(this: TemplateResult, key: any) {
-  this.key = key;
-  return this;
+  return { strings, values, isSVG: true };
 }

@@ -97,6 +97,31 @@ export function insertBefore(value: any, refChild: Node | TemplateInstance) {
   return parent.insertBefore(document.createTextNode(value), refNode);
 }
 
+export function insertTemplateInstanceBefore(
+  instance: TemplateInstance,
+  refChild: Node
+) {
+  const parent = refChild.parentNode!;
+  const mounted = instance.fragment.firstChild;
+
+  const end = instance.lastNode;
+  let node = instance.firstNode;
+
+  if (mounted) {
+    parent.insertBefore(instance.fragment, refChild);
+  } else {
+    while (node !== end) {
+      const next = node.nextSibling!;
+      parent.insertBefore(node, refChild);
+      node = next;
+    }
+
+    parent.insertBefore(node, refChild);
+  }
+
+  return instance;
+}
+
 function prepareNodeValue(value: any) {
   if ((!value && value === undefined) || value === null || value === false)
     return '';
