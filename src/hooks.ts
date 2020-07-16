@@ -60,13 +60,29 @@ export function useEffect(
   callback: () => void | (() => void),
   deps?: unknown[]
 ) {
-  const index = currentIndex++;
+  const isFirstRenderIndex = currentIndex++;
+  const depsIndex = currentIndex++;
+  const destructorIndex = currentIndex++;
   const instance = currentInstance;
 
-  const oldDeps: unknown[] = instance.state[index];
+  const isFirstRender = !instance.state[isFirstRenderIndex];
+  const oldDeps: unknown[] = instance.state[depsIndex];
   const hasChangedDeps = deps
     ? !deps.every((dep, i) => dep === (oldDeps && oldDeps[i]))
     : true;
 
-  if (hasChangedDeps) requestCallback(callback);
+  instance.state[depsIndex] = deps;
+  instance.state[isFirstRenderIndex] = true;
+
+  if (isFirstRender || hasChangedDeps) {
+    const destructor = instance.state[destructorIndex];
+    if (destructor) destructor();
+
+    requestCallback(() => {
+      const newDestructor = callback();
+
+      instance.state[destructorIndex] = newDestructor;
+      instance.desctructors.push(newDestructor);
+    });
+  }
 }

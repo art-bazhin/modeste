@@ -111,8 +111,6 @@ function createInstance(
 }
 
 function flushRenderQueue() {
-  console.log('RENDER');
-
   creationQueue.forEach(createInstance);
   creationQueue.clear();
 

@@ -52,8 +52,7 @@ export interface TemplateInstance {
   childrenArrays: TemplateInstanceChildrenArrays;
   childrenMaps: TemplateInstanceChildrenMaps;
   state: any[];
-  effects: (() => void)[];
-  desctructors: (() => void)[];
+  desctructors: ((() => void) | void)[];
 }
 
 export function createTemplateInstance(
@@ -61,7 +60,6 @@ export function createTemplateInstance(
 ): TemplateInstance {
   const instance = {
     state: [] as any[],
-    effects: [] as any[],
     desctructors: [] as any[],
   } as TemplateInstance;
 
@@ -152,6 +150,8 @@ export function updateTemplateInstance(
   instance: TemplateInstance,
   result?: TemplateResult | HookedResult<any>
 ): TemplateInstance {
+  instance.desctructors = [];
+
   let values: any[];
 
   if (!result) {
@@ -299,7 +299,8 @@ export function updateTemplateInstance(
 }
 
 export function runTemplateInstanceDestructors(instance: TemplateInstance) {
-  // if (instance.desctructor) instance.desctructor();
+  instance.desctructors.forEach((destructor) => destructor && destructor());
+  instance.desctructors = [];
 
   const arrays = instance.childrenArrays;
 
@@ -352,11 +353,6 @@ function getLISSet(arr: any[], weights: Map<any, number>) {
   }
 
   return res;
-}
-
-function runTemplateInstanceEffects(instance: TemplateInstance) {
-  instance.effects.forEach((effect) => effect());
-  instance.effects = [];
 }
 
 function valueToArray(value: any) {
