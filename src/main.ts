@@ -4,3 +4,4 @@ export { render } from '../src/render';
 export { keyed } from '../src/keyed';
 export { hooked } from './hooks';
 export { useState } from './hooks';
+export { useEffect } from './hooks';
