@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/art-bazhin/modeste/compare/v0.2.5...v0.2.6) (2020-07-16)
+
+
+### Features
+
+* add components and useState hook ([18b860b](https://github.com/art-bazhin/modeste/commit/18b860b06aa948a53fc2836a7b9b6168c2312a5b))
+* add keyed rendring ([a8ceeec](https://github.com/art-bazhin/modeste/commit/a8ceeec95f448d7a2f9e1e7dcb41935e00d959aa))
+* add render queue instead of sync rendering ([89ae509](https://github.com/art-bazhin/modeste/commit/89ae509a37cf4928e124b50044d95f71f4811618))
+* new keyed render syntax ([cdf1d94](https://github.com/art-bazhin/modeste/commit/cdf1d943b3b1184e6671ec4f90900c7a11510258))
+* useEffect hook ([a15ca1c](https://github.com/art-bazhin/modeste/commit/a15ca1c2d6fd029a976289bbd4f3922b3da4f3c5))
+
+
+### Build System
+
+* update dev dependencies ([cdb0e5e](https://github.com/art-bazhin/modeste/commit/cdb0e5e699edee29f7a924e7a1304833d7c0aa47))
+
+
+### Code Refactoring
+
+* add render queue ([40978dd](https://github.com/art-bazhin/modeste/commit/40978dd744b89f07f985314a979a3e122d041bf7))
+* refactor hooks ([9254e86](https://github.com/art-bazhin/modeste/commit/9254e862d95a0e87d563abd9fbe4c47c0030d263))
+
 ### [0.2.5](https://github.com/art-bazhin/modeste/compare/v0.2.4...v0.2.5) (2020-03-09)
 
 
