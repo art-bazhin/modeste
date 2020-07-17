@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.7](https://github.com/art-bazhin/modeste/compare/v0.2.6...v0.2.7) (2020-07-17)
+
+
+### Performance Improvements
+
+* don't search LIS if key arrays match ([4c42648](https://github.com/art-bazhin/modeste/commit/4c426486caa68f81347ab9325b751f4a2b8ab3fa))
+
 ### [0.2.6](https://github.com/art-bazhin/modeste/compare/v0.2.5...v0.2.6) (2020-07-16)
 
 
