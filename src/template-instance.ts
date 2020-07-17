@@ -192,9 +192,13 @@ export function updateTemplateInstance(
         const oldChildrenArray = instanceChildrenArrays[i];
         const oldChildrenMap = instanceChildrenMaps[i];
 
+        let isSameList = oldValueArray.length === valueArray.length;
+
         let isKeyed =
           valueArray.length &&
-          valueArray.every((value) => {
+          valueArray.every((value, i) => {
+            const oldValue = oldValueArray[i];
+
             if (!(isKeyedTemplateResult(value) || isKeyedHookedResult(value)))
               return false;
 
@@ -203,11 +207,13 @@ export function updateTemplateInstance(
               return false;
             }
 
+            if (!oldValue || oldValue.key !== value.key) isSameList = false;
+
             childrenMap.set(value.key, null as any);
             return true;
           });
 
-        if (oldChildrenMap && isKeyed) {
+        if (oldChildrenMap && isKeyed && !isSameList) {
           // Remove redundant nodes
           let removeStart: Node | null = null;
           let removeEnd: Node | null = null;
