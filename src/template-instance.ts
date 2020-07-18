@@ -52,7 +52,7 @@ export interface TemplateInstance {
   childrenArrays: TemplateInstanceChildrenArrays;
   childrenMaps: TemplateInstanceChildrenMaps;
   state: any[];
-  desctructors: ((() => void) | void)[];
+  destructors: ((() => void) | void)[] | null;
 }
 
 export function createTemplateInstance(
@@ -60,7 +60,7 @@ export function createTemplateInstance(
 ): TemplateInstance {
   const instance = {
     state: [] as any[],
-    desctructors: [] as any[],
+    destructors: [] as any[],
   } as TemplateInstance;
 
   let res: TemplateResult;
@@ -154,7 +154,7 @@ export function updateTemplateInstance(
   instance: TemplateInstance,
   result?: TemplateResult | HookedResult<any>
 ): TemplateInstance {
-  instance.desctructors = [];
+  instance.destructors = [];
 
   let values: any[];
 
@@ -335,8 +335,10 @@ export function updateTemplateInstance(
 }
 
 export function runTemplateInstanceDestructors(instance: TemplateInstance) {
-  instance.desctructors.forEach((destructor) => destructor && destructor());
-  instance.desctructors = [];
+  if (!instance.destructors) return;
+
+  instance.destructors.forEach((destructor) => destructor && destructor());
+  instance.destructors = null;
 
   const arrays = instance.childrenArrays;
 

@@ -82,7 +82,7 @@ export function useEffect(
       const newDestructor = callback();
 
       instance.state[destructorIndex] = newDestructor;
-      instance.desctructors.push(newDestructor);
+      if (instance.destructors) instance.destructors.push(newDestructor);
     });
   }
 }
