@@ -101,11 +101,12 @@ export function createTemplateInstance(
         break;
       default:
         const arr = valueToArray(value);
+        const firstValue = values[0];
 
         const childrenArray: TemplateInstanceChild[] = [];
         let childrenMap: ChildrenMap | null = null;
 
-        let isKeyed = arr[0]?.key;
+        let isKeyed = firstValue?.key;
 
         for (let i = 0; i < arr.length; i++) {
           const item = arr[i];
@@ -115,7 +116,10 @@ export function createTemplateInstance(
 
           if (
             isKeyed &&
-            (isKeyedTemplateResult(item) || isKeyedHookedResult(item))
+            ((isKeyedTemplateResult(item) &&
+              item.strings === firstValue.strings) ||
+              (isKeyedHookedResult(item) &&
+                item.getTemplateResult === firstValue.getTemplateResult))
           ) {
             if (!childrenMap) childrenMap = new Map<any, TemplateInstance>();
 
@@ -192,14 +196,32 @@ export function updateTemplateInstance(
         const oldChildrenArray = instanceChildrenArrays[i];
         const oldChildrenMap = instanceChildrenMaps[i];
 
-        let isSameList = oldValueArray.length === valueArray.length;
+        const oldFirstValue = oldValueArray[0];
+        const firstValue = valueArray[0];
+
+        let hasSameStart = true;
 
         let isKeyed =
           valueArray.length &&
           valueArray.every((value, i) => {
             const oldValue = oldValueArray[i];
+            const isTemplateResult = isKeyedTemplateResult(value);
+            const isHookedResult = isKeyedHookedResult(value);
 
-            if (!(isKeyedTemplateResult(value) || isKeyedHookedResult(value)))
+            if (!isTemplateResult && !isHookedResult) return false;
+
+            if (
+              isTemplateResult &&
+              (value as TemplateResult).strings !==
+                (firstValue as TemplateResult).strings
+            )
+              return false;
+
+            if (
+              isHookedResult &&
+              (value as HookedResult<any>).getTemplateResult !==
+                (firstValue as HookedResult<any>).getTemplateResult
+            )
               return false;
 
             if (childrenMap.has(value.key)) {
@@ -207,13 +229,21 @@ export function updateTemplateInstance(
               return false;
             }
 
-            if (!oldValue || oldValue.key !== value.key) isSameList = false;
+            if (hasSameStart && oldValue && oldValue.key !== value.key)
+              hasSameStart = false;
 
             childrenMap.set(value.key, null as any);
             return true;
           });
 
-        if (oldChildrenMap && isKeyed && !isSameList) {
+        const isTemplateChanged =
+          isKeyed &&
+          ((firstValue as TemplateResult).strings !==
+            (oldFirstValue as TemplateResult).strings ||
+            (firstValue as HookedResult<any>).getTemplateResult !==
+              (oldFirstValue as HookedResult<any>).getTemplateResult);
+
+        if (oldChildrenMap && isKeyed && !isTemplateChanged && !hasSameStart) {
           // Remove redundant nodes
           let removeStart: Node | null = null;
           let removeEnd: Node | null = null;
