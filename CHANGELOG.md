@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.8](https://github.com/art-bazhin/modeste/compare/v0.2.7...v0.2.8) (2020-07-18)
+
+
+### Code Refactoring
+
+* add more keyed render checks ([e003c67](https://github.com/art-bazhin/modeste/commit/e003c67c03de2ab4f6244ac1760b7250a715fde3))
+
 ### [0.2.7](https://github.com/art-bazhin/modeste/compare/v0.2.6...v0.2.7) (2020-07-17)
 
 
