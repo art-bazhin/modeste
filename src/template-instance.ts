@@ -349,11 +349,11 @@ export function runTemplateInstanceDestructors(instance: TemplateInstance) {
 
   const arrays = instance.childrenArrays;
 
-  Object.keys(arrays).forEach((i: any) => {
-    arrays[i].forEach((child) => {
+  for (let key in arrays) {
+    arrays[key].forEach((child) => {
       if (isTemplateInstance(child)) runTemplateInstanceDestructors(child);
     });
-  });
+  }
 }
 
 // Get set of items from longest increasing subsequence
