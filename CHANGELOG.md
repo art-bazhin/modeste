@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.9](https://github.com/art-bazhin/modeste/compare/v0.2.8...v0.2.9) (2020-07-21)
+
+
+### Features
+
+* dom node props assignment support ([703f5fc](https://github.com/art-bazhin/modeste/commit/703f5fc8380206ba9eb84ac4ead05193b1698d6d))
+
+
+### Bug Fixes
+
+* remove redundant destructors call ([832bd41](https://github.com/art-bazhin/modeste/commit/832bd41d199ac6400de87015945f79b9f33227af))
+
+
+### Code Refactoring
+
+* refactor destructors run ([dc5739c](https://github.com/art-bazhin/modeste/commit/dc5739c5373424795667c0aaf9701a5174069153))
+
+
+### Build System
+
+* update dev dependencies ([ab91200](https://github.com/art-bazhin/modeste/commit/ab9120047490480d5e40a737bd1ab37e0bdd4e52))
+
+
+### Others
+
+* update exported typings ([d775a3f](https://github.com/art-bazhin/modeste/commit/d775a3ffeef26e3abb4f503ab3db84fd0b2ddf0a))
+
 ### [0.2.8](https://github.com/art-bazhin/modeste/compare/v0.2.7...v0.2.8) (2020-07-18)
 
 
