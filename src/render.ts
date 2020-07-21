@@ -21,7 +21,7 @@ const creationQueue: Map<
 
 const renderCallbacks = new Set<() => void>();
 
-const promise = Promise && Promise.resolve();
+const promise = window.Promise && window.Promise.resolve();
 let nextTick: (callback: () => void) => void = () => {};
 
 if (window) {

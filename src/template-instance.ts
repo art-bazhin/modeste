@@ -4,6 +4,7 @@ import {
   REF_PART,
   NODE_PART,
   REF_ATTR_NAME,
+  PROP_PART,
 } from './constants';
 import { TemplateResult, isKeyedTemplateResult } from './template-result';
 import { TemplatePart } from './template-part';
@@ -90,6 +91,9 @@ export function createTemplateInstance(
     const node = dynamicNodes[i] as Element;
 
     switch (part.type) {
+      case PROP_PART:
+        processProp(part.name!, value, node);
+        break;
       case ATTR_PART:
         processAttr(part.name!, value, node);
         break;
@@ -180,6 +184,9 @@ export function updateTemplateInstance(
     const part = parts[i];
 
     switch (part.type) {
+      case PROP_PART:
+        processProp(part.name!, value, node);
+        break;
       case ATTR_PART:
         processAttr(part.name!, value, node);
         break;
@@ -398,6 +405,10 @@ function valueToArray(value: any) {
   return [value];
 }
 
+function processProp(name: string, value: any, node: Element) {
+  (node as any)[name] = value;
+}
+
 function processAttr(attr: string, value: any, node: Element) {
   switch (value) {
     case true:
@@ -407,7 +418,6 @@ function processAttr(attr: string, value: any, node: Element) {
     case undefined:
       return node.removeAttribute(attr);
     default:
-      if (attr === 'value') (node as any).value = value;
       node.setAttribute(attr, value as string);
   }
 }

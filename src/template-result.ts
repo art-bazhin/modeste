@@ -3,12 +3,14 @@ import {
   ATTR_MARK,
   PLACEHOLDER_COMMENT,
   ATTR_NUM_SEPARATOR,
+  PROP_MARK,
 } from './constants';
 
 const markRegEx = new RegExp(PLACEHOLDER_MARK, 'gm');
 const tagRegEx = /<[a-z][a-z\d-]*([^<>]|("[^"]*")|('[^']*'))*>/gm;
+
 const attrRegEx = new RegExp(
-  '([a-z][a-z\\d-]*)=((' +
+  '((\\.[a-zA-Z_$][0-9a-zA-Z_$]*)|([a-z][a-z\\d-]*))=((' +
     PLACEHOLDER_MARK +
     ')|("' +
     PLACEHOLDER_MARK +
@@ -20,7 +22,13 @@ const attrRegEx = new RegExp(
 
 function replaceTag(tag: string) {
   let num = 0;
+
   let tagProcessed = tag.replace(attrRegEx, function (attr, p1) {
+    if (p1[0] === '.') {
+      const val = '"' + p1.substr(1) + '"';
+      return PROP_MARK + ATTR_NUM_SEPARATOR + num++ + '=' + val;
+    }
+
     return p1 + '=' + ATTR_MARK + ATTR_NUM_SEPARATOR + num++;
   });
 

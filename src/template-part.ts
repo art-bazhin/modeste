@@ -4,22 +4,39 @@ import {
   EVENT_PART,
   REF_PART,
   ATTR_NUM_SEPARATOR,
-  REF_ATTR_NAME
+  REF_ATTR_NAME,
+  PROP_MARK,
+  PROP_PART,
 } from './constants';
 
 function getAttributes(node: Element) {
   const attrs = node.attributes;
-  const result: Attr[] = [];
+  const result: {
+    name: string;
+    type: number;
+  }[] = [];
 
   for (let i = 0; i < attrs.length; i++) {
+    const name = attrs[i].name;
     const value = attrs[i].value;
 
-    if (value.indexOf(ATTR_MARK) === 0) {
-      result[+value.split(ATTR_NUM_SEPARATOR)[1]] = attrs[i];
+    if (name.indexOf(PROP_MARK) === 0) {
+      result[+name.split(ATTR_NUM_SEPARATOR)[1]] = {
+        type: PROP_PART,
+        name: value,
+      };
+
+      node.removeAttribute(name);
+      i--;
+    } else if (value.indexOf(ATTR_MARK) === 0) {
+      result[+value.split(ATTR_NUM_SEPARATOR)[1]] = {
+        type: ATTR_PART,
+        name,
+      };
     }
   }
 
-  return result.filter(el => el);
+  return result;
 }
 
 export interface TemplatePart {
@@ -37,19 +54,21 @@ export function getTemplatePartsFromElement(
 
   for (let i = 0; i < attrs.length; i++) {
     let part: TemplatePart = {
-      type: ATTR_PART,
-      position: position.slice()
+      ...attrs[i],
+      position: position.slice(),
     };
 
-    const attrName = attrs[i].name;
+    const name = part.name!;
 
-    if (attrName[0] === 'o' && attrName[1] === 'n') {
-      part.type = EVENT_PART;
-      part.name = attrName.substr(2);
-    } else if (attrName === REF_ATTR_NAME) {
-      part.type = REF_PART;
-    } else {
-      part.name = attrName;
+    if (part.type === ATTR_PART) {
+      if (name[0] === 'o' && name[1] === 'n') {
+        part.type = EVENT_PART;
+        part.name = name.substr(2);
+      } else if (name === REF_ATTR_NAME) {
+        part.type = REF_PART;
+      } else {
+        part.name = name;
+      }
     }
 
     parts.push(part);
