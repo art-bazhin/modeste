@@ -10,13 +10,9 @@ const markRegEx = new RegExp(PLACEHOLDER_MARK, 'gm');
 const tagRegEx = /<[a-z][a-z\d-]*([^<>]|("[^"]*")|('[^']*'))*>/gm;
 
 const attrRegEx = new RegExp(
-  '((\\.[a-zA-Z_$][0-9a-zA-Z_$]*)|([a-z][a-z\\d-]*))=((' +
+  '((\\.[a-zA-Z_$][0-9a-zA-Z_$]*)|([a-z][a-z\\d-]*))[\\s\\n]*=[\\s\\n]*((' +
     PLACEHOLDER_MARK +
-    ')|("' +
-    PLACEHOLDER_MARK +
-    '")|(\'' +
-    PLACEHOLDER_MARK +
-    "'))",
+    '))',
   'gm'
 );
 
@@ -29,7 +25,8 @@ function replaceTag(tag: string) {
       return PROP_MARK + ATTR_NUM_SEPARATOR + num++ + '=' + val;
     }
 
-    return p1 + '=' + ATTR_MARK + ATTR_NUM_SEPARATOR + num++;
+    const val = '"' + ATTR_MARK + ATTR_NUM_SEPARATOR + num++ + '"';
+    return p1 + '=' + val;
   });
 
   if (tagProcessed !== tag) {
