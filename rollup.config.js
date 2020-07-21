@@ -8,19 +8,19 @@ export default [
     input: 'src/main.ts',
     output: {
       name: 'modeste',
-      file: 'dist/modeste.iife.min.js',
-      format: 'iife'
+      file: 'dist/modeste.min.js',
+      format: 'iife',
     },
     plugins: [
       ts({
         tsconfig: {
           target: 'ES5',
           module: 'es2015',
-          strict: true
-        }
+          strict: true,
+        },
       }),
-      uglify()
-    ]
+      uglify(),
+    ],
   },
 
   {
@@ -31,10 +31,10 @@ export default [
           target: 'ES2015',
           module: 'es2015',
           declaration: true,
-          strict: true
-        }
-      })
+          strict: true,
+        },
+      }),
     ],
-    output: { file: pkg.main, format: 'es' }
-  }
+    output: { file: pkg.main, format: 'es' },
+  },
 ];
