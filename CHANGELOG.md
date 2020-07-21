@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/art-bazhin/modeste/compare/v0.2.9...v0.3.0) (2020-07-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* Using of template attribute and prop values in quotes is forbidden. Use unquoted
+variant instead: attr-name="${value}" --> attr-name=${value}
+
+### Bug Fixes
+
+* update template parsing ([507afb8](https://github.com/art-bazhin/modeste/commit/507afb8475fc5bcea738476ccb5421baac40d5f8))
+
 ### [0.2.9](https://github.com/art-bazhin/modeste/compare/v0.2.8...v0.2.9) (2020-07-21)
 
 
