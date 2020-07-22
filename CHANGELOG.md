@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/art-bazhin/modeste/compare/v0.3.0...v0.3.1) (2020-07-22)
+
+
+### Performance Improvements
+
+* remove redundant map initialization, refactor part type check ([2092947](https://github.com/art-bazhin/modeste/commit/209294742c2fde2a289e8e84d8bb4ff04fed3ab0))
+
 ## [0.3.0](https://github.com/art-bazhin/modeste/compare/v0.2.9...v0.3.0) (2020-07-21)
 
 
