@@ -123,41 +123,31 @@ export function insertTemplateInstanceBefore(
 }
 
 function prepareNodeValue(value: any) {
-  if ((!value && value === undefined) || value === null || value === false)
+  if (!value && (value === undefined || value === null || value === false))
     return '';
   return value;
 }
 
 function hasSameType(value: any, oldValue: any) {
-  const valueIsTemplateResult = isTemplateResult(value);
-  const oldValueIsTemplateResult = isTemplateResult(oldValue);
-
-  const valueIsHookedResult = isHookedResult(value);
-  const oldValueIsHookedResult = isHookedResult(oldValue);
-
   if (
-    valueIsHookedResult &&
-    oldValueIsHookedResult &&
-    value.getTemplateResult === oldValue.getTemplateResult
+    (typeof value === 'string' || typeof value === 'number') &&
+    (typeof oldValue === 'string' || typeof oldValue === 'number')
   )
-    return HOOKED;
+    return STRING;
 
   if (
-    valueIsTemplateResult &&
-    oldValueIsTemplateResult &&
+    isTemplateResult(value) &&
+    isTemplateResult(oldValue) &&
     value.strings === oldValue.strings
   )
     return TEMPLATE_RESULT;
 
   if (
-    !valueIsHookedResult &&
-    !oldValueIsHookedResult &&
-    !valueIsTemplateResult &&
-    !oldValueIsTemplateResult &&
-    !isDOMNode(value) &&
-    !isDOMNode(oldValue)
+    isHookedResult(value) &&
+    isHookedResult(oldValue) &&
+    value.getTemplateResult === oldValue.getTemplateResult
   )
-    return STRING;
+    return HOOKED;
 
   return false;
 }

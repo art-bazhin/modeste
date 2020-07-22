@@ -170,7 +170,7 @@ export function updateTemplateInstance(
     values = result.values;
   }
 
-  const parts = instance.template.parts;
+  const parts = instance.parts;
   const instanceChildrenArrays = instance.childrenArrays;
   const instanceChildrenMaps = instance.childrenMaps;
 
@@ -184,11 +184,11 @@ export function updateTemplateInstance(
     const part = parts[i];
 
     switch (part.type) {
-      case PROP_PART:
-        processProp(part.name!, value, node);
-        break;
       case ATTR_PART:
         processAttr(part.name!, value, node);
+        break;
+      case PROP_PART:
+        processProp(part.name!, value, node);
         break;
       case REF_PART:
         processRef(value, node);
@@ -198,7 +198,7 @@ export function updateTemplateInstance(
         const oldValueArray = valueToArray(oldValue);
 
         const childrenArray: ChildrenArray = [];
-        let childrenMap: ChildrenMap = new Map();
+        let childrenMap: ChildrenMap;
 
         const oldChildrenArray = instanceChildrenArrays[i];
         const oldChildrenMap = instanceChildrenMaps[i];
@@ -231,7 +231,8 @@ export function updateTemplateInstance(
             )
               return false;
 
-            if (childrenMap.has(value.key)) {
+            if (!childrenMap) childrenMap = new Map();
+            else if (childrenMap.has(value.key)) {
               showKeyDuplicateWarning(value);
               return false;
             }
@@ -275,7 +276,7 @@ export function updateTemplateInstance(
           const weights = new Map<any, number>();
           oldChildrenMap.forEach((value, key) => weights.set(key, w++));
 
-          const lis = getLISSet(Array.from(childrenMap.keys()), weights);
+          const lis = getLISSet(Array.from(childrenMap!.keys()), weights);
           let currentNode: Node = node;
 
           for (let i = valueArray.length - 1; i >= 0; i--) {
@@ -291,7 +292,7 @@ export function updateTemplateInstance(
             currentNode = instance.firstNode;
 
             childrenArray.unshift(instance);
-            childrenMap.set(key, instance);
+            childrenMap!.set(key, instance);
           }
         } else {
           const min = Math.min(valueArray.length, oldValueArray.length);
@@ -317,7 +318,7 @@ export function updateTemplateInstance(
 
             childrenArray.push(child);
 
-            if (isKeyed) childrenMap.set(item.key, child as TemplateInstance);
+            if (isKeyed) childrenMap!.set(item.key, child as TemplateInstance);
           }
 
           if (newArrayIsSmaller) {
@@ -330,7 +331,7 @@ export function updateTemplateInstance(
         }
 
         instanceChildrenArrays[i] = childrenArray;
-        instanceChildrenMaps[i] = isKeyed ? childrenMap : null;
+        instanceChildrenMaps[i] = isKeyed ? childrenMap! : null;
     }
   }
 
