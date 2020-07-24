@@ -48,9 +48,10 @@ export function updateChild(
 
 export function removeNodes(start: Node, end: Node) {
   const parent = start.parentNode!;
+  const last = end.nextSibling;
   let node = start;
 
-  while (node !== end) {
+  while (node !== last) {
     const instance = (node as any).__MDST_INSTANCE__;
     if (instance) runTemplateInstanceDestructors(instance);
 
@@ -58,8 +59,6 @@ export function removeNodes(start: Node, end: Node) {
     parent.removeChild(node);
     node = next;
   }
-
-  parent.removeChild(node);
 }
 
 export function removeChild(child: TemplateInstanceChild) {
