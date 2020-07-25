@@ -39,7 +39,7 @@ describe('render function', () => {
 
       expect(paragraph).toBeTruthy();
       expect(paragraph!.tagName).toBe('P');
-      expect(paragraph!.getAttribute('id')).toBe('test');
+      expect(paragraph!.getAttribute('id')).toBe('test_');
       expect(paragraph!.className).toBe('test class');
       expect((paragraph as any).someProp).toBe('prop assign test');
       expect(paragraph!.textContent?.trim()).toBe('Test string');
