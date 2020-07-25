@@ -55,7 +55,7 @@ export function isTemplateResult(res: any): res is TemplateResult {
 }
 
 export function isKeyedTemplateResult(res: any): res is TemplateResult {
-  return isTemplateResult(res) && res.key;
+  return isTemplateResult(res) && res.key !== undefined;
 }
 
 export function createTemplateResult(

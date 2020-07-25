@@ -30,7 +30,7 @@ export function isHookedResult(res: any): res is HookedResult<any> {
 }
 
 export function isKeyedHookedResult(res: any): res is HookedResult<any> {
-  return isHookedResult(res) && res.key;
+  return isHookedResult(res) && res.key !== undefined;
 }
 
 export function getHookedTemplateResult(

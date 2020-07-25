@@ -105,12 +105,12 @@ export function createTemplateInstance(
         break;
       default:
         const arr = valueToArray(value);
-        const firstValue = values[0];
+        const firstValue = arr[0];
 
         const childrenArray: TemplateInstanceChild[] = [];
         let childrenMap: ChildrenMap | null = null;
 
-        let isKeyed = firstValue?.key;
+        let isKeyed = firstValue && firstValue.key !== undefined;
 
         for (let i = 0; i < arr.length; i++) {
           const item = arr[i];
