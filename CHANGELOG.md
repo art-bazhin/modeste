@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.6](https://github.com/art-bazhin/modeste/compare/v0.3.5...v0.3.6) (2020-07-25)
+
+
+### Bug Fixes
+
+* fix deploy job ([3bb1516](https://github.com/art-bazhin/modeste/commit/3bb15165570799ad1c582f3c59bdf8fe3dd144b7))
+
+
+### CI
+
+* remove redundant lines from config ([5cd21fb](https://github.com/art-bazhin/modeste/commit/5cd21fb3795e876a3cb2319892c6bd8470ef97c2))
+
 ### [0.3.5](https://github.com/art-bazhin/modeste/compare/v0.3.4...v0.3.5) (2020-07-25)
 
 
