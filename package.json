@@ -6,8 +6,6 @@
   "bugs": "https://github.com/art-bazhin/modeste/issues",
   "version": "0.3.6",
   "main": "dist/modeste.js",
-  "browser": "dist/modeste.min.js",
-  "unpkg": "dist/modeste.min.js",
   "types": "dist/modeste.d.ts",
   "license": "MIT",
   "devDependencies": {
