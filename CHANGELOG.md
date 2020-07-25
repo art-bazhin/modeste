@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://github.com/art-bazhin/modeste/compare/v0.3.2...v0.3.3) (2020-07-25)
+
+
+### Build System
+
+* target ES2015 in browser build ([d3f67e5](https://github.com/art-bazhin/modeste/commit/d3f67e51ac3390d5a77e55482370d688062c9b95))
+
 ### [0.3.2](https://github.com/art-bazhin/modeste/compare/v0.3.1...v0.3.2) (2020-07-25)
 
 
