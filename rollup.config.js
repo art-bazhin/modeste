@@ -1,4 +1,4 @@
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 import ts from 'rollup-plugin-ts';
 import pkg from './package.json';
 
@@ -14,12 +14,12 @@ export default [
     plugins: [
       ts({
         tsconfig: {
-          target: 'ES5',
+          target: 'ES2015',
           module: 'es2015',
           strict: true,
         },
       }),
-      uglify(),
+      terser(),
     ],
   },
 
