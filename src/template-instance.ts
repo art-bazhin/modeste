@@ -430,7 +430,7 @@ function processEvent(
   index: number
 ) {
   node.addEventListener(event, (e: any) => {
-    if (instance.values[index]) instance.values[index].bind(node)(e);
+    if (instance.values[index]) instance.values[index](e);
   });
 
   (node as Element).removeAttribute('on' + event);

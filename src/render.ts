@@ -21,19 +21,31 @@ const creationQueue = new Map<Element, TemplateResult | HookedResult<any>>();
 const effects = new Set<() => void>();
 const layoutEffects = new Set<() => void>();
 
-const promise = window.Promise && window.Promise.resolve();
+const promise = Promise && Promise.resolve();
 
 const elementInstanceMap = new Map<Element, TemplateInstance>();
 const elementHookedMap = new Map<Element, (...args: any[]) => TemplateResult>();
 
 const shouldBeDestructed = new Set<TemplateInstance>();
 
+// This macrotask queue method is not stable in Firefox.
+
+// const channel = MessageChannel && new MessageChannel();
+// if (channel) channel.port1.onmessage = flushEffects;
+
 function queueMicrotask(callback: () => void) {
   promise.then(callback);
 }
 
 function queueTask(callback: () => void) {
-  setTimeout(() => callback(), 15);
+  setTimeout(() => callback(), 15); // 0 ms timeout is not stable in Firefox
+}
+
+function asyncFlushEffects() {
+  if (!effects.size) return;
+  // if (channel) channel.port2.postMessage('RUN_FX');
+  // else queueTask(flushEffects);
+  queueTask(flushEffects);
 }
 
 export function render(
@@ -95,7 +107,7 @@ function runRenderCycle() {
   isEffectsRequested = true;
   isRenderRequested = false;
 
-  if (effects.size) queueTask(flushEffects);
+  asyncFlushEffects();
 }
 
 function requestInstanceCreation(
