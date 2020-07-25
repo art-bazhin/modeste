@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/art-bazhin/modeste/compare/v0.3.1...v0.3.2) (2020-07-25)
+
+
+### Features
+
+* separate useEffect and useLayoutEffect ([02c60f8](https://github.com/art-bazhin/modeste/commit/02c60f8ab2ace76576e20fdfa37d9a841cd3fdaf))
+
+
+### Bug Fixes
+
+* fix missed destructor call ([95357ab](https://github.com/art-bazhin/modeste/commit/95357ab64377a6631a9d6dad1de34659ac64085e))
+* handle empty template properly ([d6bebfd](https://github.com/art-bazhin/modeste/commit/d6bebfd112f9d7000f23d38b5edc1bc3bdce4464))
+* remove console log ([3e0ad03](https://github.com/art-bazhin/modeste/commit/3e0ad03182628a5824d2d4b697f7a08cc8d2e46e))
+* remove event binding to DOM nodes ([7eb8fcb](https://github.com/art-bazhin/modeste/commit/7eb8fcbbff8df1320e71abd97ef76cf2fd57da2a))
+
+
+### Tests
+
+* setup tests ([497d9fb](https://github.com/art-bazhin/modeste/commit/497d9fbc132ba7022523d7333152aef1b1466b67))
+
 ### [0.3.1](https://github.com/art-bazhin/modeste/compare/v0.3.0...v0.3.1) (2020-07-22)
 
 
