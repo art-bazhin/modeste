@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://github.com/art-bazhin/modeste/compare/v0.3.4...v0.3.5) (2020-07-25)
+
+
+### CI
+
+* fix deploy job ([4927a17](https://github.com/art-bazhin/modeste/commit/4927a17835f8d854d78820dbeb50caacdc78c60f))
+
 ### [0.3.4](https://github.com/art-bazhin/modeste/compare/v0.3.3...v0.3.4) (2020-07-25)
 
 
