@@ -23,7 +23,7 @@ export function getTemplate(res: TemplateResult): Template {
 
   const fragment = templateElement.content;
 
-  if (isPlaceholder(fragment.firstChild))
+  if (isPlaceholder(fragment.firstChild) || !fragment.firstChild)
     fragment.insertBefore(createMarkNode(), fragment.firstChild);
 
   if (res.isSVG) {
