@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/art-bazhin/modeste/compare/v0.3.6...v0.3.7) (2020-07-25)
+
+
+### Bug Fixes
+
+* allow to write template values in quotes ([f89cbf2](https://github.com/art-bazhin/modeste/commit/f89cbf27f21f0ece9e2e04bd0c87b5deb313a403))
+
+
+### Build System
+
+* remove browser and unpkg path from package.json ([370cb57](https://github.com/art-bazhin/modeste/commit/370cb57d18fc78fe43326d29a71f45499d416f4e))
+
 ### [0.3.6](https://github.com/art-bazhin/modeste/compare/v0.3.5...v0.3.6) (2020-07-25)
 
 
