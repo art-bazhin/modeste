@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.4](https://github.com/art-bazhin/modeste/compare/v0.3.3...v0.3.4) (2020-07-25)
+
+
+### CI
+
+* configure test job in travis ([9a96afa](https://github.com/art-bazhin/modeste/commit/9a96afa98bd3a1b38f9a253f862bd0ac804db654))
+
 ### [0.3.3](https://github.com/art-bazhin/modeste/compare/v0.3.2...v0.3.3) (2020-07-25)
 
 
