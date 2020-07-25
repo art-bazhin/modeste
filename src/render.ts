@@ -2,45 +2,43 @@ import {
   createTemplateInstance,
   updateTemplateInstance,
   TemplateInstance,
+  runTemplateInstanceDestructors,
 } from './template-instance';
 import { TemplateResult } from './template-result';
 import { getTemplate } from './template';
-import { HookedResult, isHookedResult, getHookedTemplateResult } from './hooks';
+import { HookedResult, isHookedResult } from './hooks';
 
 let isRenderRequested = false;
+let isEffectsRequested = false;
 
-const renderQueue: Map<
+const renderQueue = new Map<
   TemplateInstance,
   HookedResult<any> | TemplateResult | undefined
-> = new Map();
+>();
 
-const creationQueue: Map<
-  HTMLElement,
-  TemplateResult | HookedResult<any>
-> = new Map();
+const creationQueue = new Map<Element, TemplateResult | HookedResult<any>>();
 
-const renderCallbacks = new Set<() => void>();
+const effects = new Set<() => void>();
+const layoutEffects = new Set<() => void>();
 
 const promise = window.Promise && window.Promise.resolve();
-let nextTick: (callback: () => void) => void = () => {};
 
-if (window) {
-  if (promise) nextTick = (callback) => promise.then(callback);
-  else if (requestAnimationFrame)
-    nextTick = (callback) => requestAnimationFrame(callback);
-  else nextTick = (callback) => setTimeout(callback);
+const elementInstanceMap = new Map<Element, TemplateInstance>();
+const elementHookedMap = new Map<Element, (...args: any[]) => TemplateResult>();
+
+const shouldBeDestructed = new Set<TemplateInstance>();
+
+function queueMicrotask(callback: () => void) {
+  promise.then(callback);
 }
 
-const elementInstanceMap = new Map<HTMLElement, TemplateInstance>();
-
-const elementHookedMap = new Map<
-  HTMLElement,
-  (...args: any[]) => TemplateResult
->();
+function queueTask(callback: () => void) {
+  setTimeout(() => callback(), 15);
+}
 
 export function render(
   result: TemplateResult | HookedResult<any>,
-  container: HTMLElement,
+  container: Element,
   callback?: () => void
 ) {
   const instance = elementInstanceMap.get(container);
@@ -48,7 +46,7 @@ export function render(
 
   let shouldCreateInstance = false;
 
-  requestCallback(callback);
+  requestLayoutEffect(callback);
 
   if (isHookedResult(result))
     shouldCreateInstance = !hooked || hooked !== result.getTemplateResult;
@@ -56,8 +54,10 @@ export function render(
     shouldCreateInstance =
       !instance || getTemplate(result) !== instance.template;
 
-  if (shouldCreateInstance) requestInstanceCreation(result, container);
-  else requestInstanceRender(instance!, result);
+  if (shouldCreateInstance) {
+    if (instance) shouldBeDestructed.add(instance);
+    requestInstanceCreation(result, container);
+  } else requestInstanceRender(instance!, result);
 }
 
 export function removeInstanceFromRenderQueue(instance: TemplateInstance) {
@@ -69,21 +69,38 @@ export function requestInstanceRender(
   result?: HookedResult<any> | TemplateResult
 ) {
   renderQueue.set(instance, result);
-  requestRender();
+  requestRender(result);
 }
 
-export function requestCallback(callback?: () => void) {
-  if (callback) renderCallbacks.add(callback);
+export function requestEffect(callback?: () => void) {
+  if (callback) effects.add(callback);
 }
 
-function requestRender() {
-  if (!isRenderRequested) nextTick(flushRenderQueue);
+export function requestLayoutEffect(callback?: () => void) {
+  if (callback) layoutEffects.add(callback);
+}
+
+function requestRender(result?: any) {
+  if (!isRenderRequested) queueMicrotask(runRenderCycle);
   isRenderRequested = true;
+}
+
+function runRenderCycle() {
+  flushEffects();
+  flushDestructions();
+  flushCreationQueue();
+  flushRenderQueue();
+  flushLayoutEffects();
+
+  isEffectsRequested = true;
+  isRenderRequested = false;
+
+  if (effects.size) queueTask(flushEffects);
 }
 
 function requestInstanceCreation(
   result: TemplateResult | HookedResult<any>,
-  container: HTMLElement
+  container: Element
 ) {
   creationQueue.set(container, result);
   requestRender();
@@ -98,7 +115,7 @@ function renderInstance(
 
 function createInstance(
   result: TemplateResult | HookedResult<any>,
-  container: HTMLElement
+  container: Element
 ) {
   container.innerHTML = '';
   const instance = createTemplateInstance(result);
@@ -110,14 +127,29 @@ function createInstance(
   else elementHookedMap.delete(container);
 }
 
-function flushRenderQueue() {
+function flushCreationQueue() {
   creationQueue.forEach(createInstance);
   creationQueue.clear();
+}
 
+function flushRenderQueue() {
   renderQueue.forEach(renderInstance);
+  console.log('RENDER');
+}
 
-  renderCallbacks.forEach((cb) => cb());
-  renderCallbacks.clear();
+function flushLayoutEffects() {
+  layoutEffects.forEach((cb) => cb());
+  layoutEffects.clear();
+}
 
-  isRenderRequested = false;
+function flushEffects() {
+  if (!isEffectsRequested) return;
+
+  effects.forEach((cb) => cb());
+  effects.clear();
+  isEffectsRequested = false;
+}
+
+function flushDestructions() {
+  shouldBeDestructed.forEach((i) => runTemplateInstanceDestructors(i));
 }

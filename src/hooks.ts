@@ -1,6 +1,10 @@
 import { TemplateInstance, updateTemplateInstance } from './template-instance';
 import { TemplateResult } from './template-result';
-import { requestInstanceRender, requestCallback } from './render';
+import {
+  requestInstanceRender,
+  requestLayoutEffect,
+  requestEffect,
+} from './render';
 
 let currentHookedResult: HookedResult<any>;
 let currentInstance: TemplateInstance;
@@ -56,7 +60,8 @@ export function useState<T>(initialValue: T) {
   return [value, setValue] as [T, (newValue: T) => void];
 }
 
-export function useEffect(
+function useEffectBase(
+  requestCallback: (cb: () => void) => void,
   callback: () => void | (() => void),
   deps?: unknown[]
 ) {
@@ -85,4 +90,18 @@ export function useEffect(
       if (instance.destructors) instance.destructors.push(newDestructor);
     });
   }
+}
+
+export function useEffect(
+  callback: () => void | (() => void),
+  deps?: unknown[]
+) {
+  useEffectBase(requestEffect, callback, deps);
+}
+
+export function useLayoutEffect(
+  callback: () => void | (() => void),
+  deps?: unknown[]
+) {
+  useEffectBase(requestLayoutEffect, callback, deps);
 }

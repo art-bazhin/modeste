@@ -8,5 +8,6 @@ export { keyed } from '../src/keyed';
 export { hooked } from './hooks';
 export { useState } from './hooks';
 export { useEffect } from './hooks';
+export { useLayoutEffect } from './hooks';
 
 export type RenderResult = TemplateResult | HookedResult<any>;
