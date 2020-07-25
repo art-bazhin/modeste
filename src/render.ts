@@ -146,7 +146,6 @@ function flushCreationQueue() {
 
 function flushRenderQueue() {
   renderQueue.forEach(renderInstance);
-  console.log('RENDER');
 }
 
 function flushLayoutEffects() {
