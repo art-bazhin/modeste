@@ -26,6 +26,19 @@ const app = () => {
   `;
 };
 
+const quotesTest = () => {
+  return html`
+    <div
+      data-no-quotes=${'no'}
+      data-single-quotes="${'single'}"
+      data-double-quotes="${'double'}"
+      .noQuotesProp=${'no'}
+      .singleQuotesProp="${'single'}"
+      .doubleQuotesProp="${'double'}"
+    ></div>
+  `;
+};
+
 describe('render function', () => {
   beforeAll(() => {
     document.body.innerHTML = '<div id="app"></div>';
@@ -60,6 +73,20 @@ describe('render function', () => {
       return mockClick.mock.results[0].value.then(() => {
         expect(+counter.textContent!).toBe(count);
       });
+    });
+  });
+
+  it('correctly handles attrs and props with quotes', () => {
+    return renderPromise(quotesTest(), container).then(() => {
+      const el = container.children[0] as HTMLElement;
+
+      expect(el).toBeTruthy();
+      expect(el.getAttribute('data-no-quotes')).toBe('no');
+      expect(el.getAttribute('data-single-quotes')).toBe('single');
+      expect(el.getAttribute('data-double-quotes')).toBe('double');
+      expect((el as any).noQuotesProp).toBe('no');
+      expect((el as any).singleQuotesProp).toBe('single');
+      expect((el as any).doubleQuotesProp).toBe('double');
     });
   });
 });

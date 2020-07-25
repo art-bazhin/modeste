@@ -9,10 +9,12 @@ import {
 const markRegEx = new RegExp(PLACEHOLDER_MARK, 'gm');
 const tagRegEx = /<[a-z][a-z\d-]*([^<>]|("[^"]*")|('[^']*'))*>/gm;
 
+const propNameGroup = '(\\.[a-zA-Z_$][0-9a-zA-Z_$]*)';
+const attrNameGroup = '([a-z][a-z\\d-]*)';
+const valueGroup = `(${PLACEHOLDER_MARK}|"${PLACEHOLDER_MARK}"|'${PLACEHOLDER_MARK}')`;
+
 const attrRegEx = new RegExp(
-  '((\\.[a-zA-Z_$][0-9a-zA-Z_$]*)|([a-z][a-z\\d-]*))[\\s\\n]*=[\\s\\n]*((' +
-    PLACEHOLDER_MARK +
-    '))',
+  `(${propNameGroup}|${attrNameGroup})[\\s\\n]*=[\\s\\n]*${valueGroup}`,
   'gm'
 );
 
